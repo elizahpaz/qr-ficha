@@ -1,0 +1,9 @@
+@import url('https://fonts.googleapis.com/css2?family=Sansation:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap');
+
+:root {
+  --font-verdana: "Sansation", sans-serif;
+
+  --bg-cor: #FFFEF9;
+  --primary-color: #5E8B7E;
+  --secondary-color: #1A4349;
+}
