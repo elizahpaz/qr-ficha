@@ -1,4 +1,94 @@
 .container {
-    background-color: rgb(206, 206, 255);
+  min-height: 30vh;
+  display: flex;
+  flex-direction: column; 
 }
 
+.bannerContainer {
+  background-color: var(--off-white);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 4rem 2rem;
+}
+
+.textContainer {
+  text-align: center;
+  max-width: 800px;
+  padding: 2.5rem;
+}
+
+.textContainer h1 {
+  font-size: 4.5rem; /* Tamanho grande e impactante */
+  color: var(--primary-color);
+  margin-bottom: 1.5rem;
+  font-weight: 800; /* Negrito pesado */
+  text-transform: uppercase; /* Maiúsculas para impacto */
+  letter-spacing: -1px; /* Espaçamento entre letras */
+  line-height: 1.1;
+}
+
+.textContainer p {
+  color: var(--text-color);
+  font-size: 1.8rem;
+  margin-bottom: 2.5rem;
+  line-height: 1.6;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+  font-weight: 500;
+}
+
+.button {
+  background-color: var(--primary-color);
+  color: var(--bg-cor);
+  font-size: 1.4rem;
+  font-weight: 700;
+  padding: 1.2rem 3rem;
+  border: none;
+  border-radius: 50px; 
+  cursor: pointer;
+  transition: all 0.3s ease; 
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.button:hover {
+  background-color: var(--secondary-color);
+  transform: translateY(-3px); 
+  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.3);
+}
+
+@media (max-width: 768px) {
+  .bannerContainer {
+    padding: 3rem 1rem;
+  }
+
+  .textContainer {
+    padding: 1.5rem;
+    border-radius: 15px;
+  }
+
+  .textContainer h1 {
+    font-size: 3rem; 
+    margin-bottom: 1rem;
+  }
+
+  .textContainer p {
+    font-size: 1.3rem; 
+    margin-bottom: 2rem;
+  }
+
+  .button {
+    font-size: 1.2rem;
+    padding: 1rem 2.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .textContainer h1 {
+    font-size: 2.5rem;
+  }
+  .textContainer p {
+    font-size: 1.1rem;
+  }
+}

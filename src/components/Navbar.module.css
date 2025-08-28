@@ -1,16 +1,17 @@
 @import '../styles/_variables.css';
 
 nav {
-  background-color: var(--primary-color);
+  background-color: var(--bg-cor);
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: space-around;
   min-height: 90px;
   font-size: 1.1rem;
+  box-shadow: -2px 0 5px rgba(0,0,0,0.1);
 }
 
 .logo {
-  max-width: 100px;
+  max-width: 150px;
   max-height: 100px;
   display: flex;
   align-items: center;
@@ -21,25 +22,25 @@ nav {
 .links a{
   margin-right: 3rem;
   text-decoration: none;
-  color: var(--bg-cor);
+  color: var(--text-color);
   font-weight: 550;
 }
 
 .links a:hover {
-  color: var(--secondary-color);
+  color: var(--primary-color);
   font-weight: 600;
 }
 
 .button {
   padding: 8px 25px;
   margin-right: 2rem;
-  background-color: var(--bg-cor);
+  background-color: var(--primary-color);
   outline: none;
   border: none;
   border-radius: 10px;
   cursor: pointer;
   font-weight: 550;
-  color: var(--primary-color);
+  color: var(--bg-cor);
   font-size: 1rem;
   transition: 0.3s;
 }
@@ -50,6 +51,69 @@ nav {
   color: var(--bg-cor);
 }
 
-.menu {
+.menuButton, .closeButton {
   display: none;
+}
+
+/* Media Query para telas menores */
+@media (max-width: 768px) {
+  .navbar {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .links {
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 100vh; 
+    width: 100%; 
+    max-width: 300px; 
+    background-color: var(--primary-color);
+    padding: 2rem;
+    box-shadow: -2px 0 5px rgba(0,0,0,0.1);
+
+    transform: translateX(100%);
+    transition: transform 0.3s ease-in-out;
+
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.5rem;
+  }
+
+  .links.open {
+    transform: translateX(0);
+  }
+
+  .menuButton {
+    display: block; 
+    position: static;
+    font-size: 1.5rem; 
+    padding: 0.8rem;
+    outline: none;
+    border: none;
+    cursor: pointer;
+    background-color: transparent;
+    color: var(--text-color);
+  }
+
+  .closeButton {
+    display: block;
+    position: absolute;
+    top: 1rem;
+    right: 1.5rem;
+    font-size: 1.5rem;
+    cursor: pointer;
+    border: none;
+    background-color: transparent;
+    color: var(--text-color);
+    z-index: 10;
+  }
+
+  .button {
+    background-color: var(--bg-cor);
+    color: var(--secondary-color);
+  }
 }

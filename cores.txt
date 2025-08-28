@@ -1,5 +1,0 @@
-off-white: #FFFEF9
-verde claro: #5E8B7E
-verde-escuro: #1A4349
-
-react-icons: https://react-icons.github.io/react-icons/icons/fa/
