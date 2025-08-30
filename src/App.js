@@ -1,16 +1,16 @@
-import Main from './components/Main';
-import Funcionamento from './components/Funcionamento';
-import Contact from './components/Contact';
-import Footer from './components/Footer';
+import React from "react";
+import { Routes, Route } from 'react-router-dom';
+import LandingPage from "./components/pages/LandingPage";
+import Login from './components/pages/Login';
+import Register from './components/pages/Register';
 
 function App() {
   return (
-    <div className="App">
-      <Main />
-      <Funcionamento />
-      <Contact />
-      <Footer />
-    </div>
+    <Routes>
+      <Route path="/" element={<LandingPage />}/>
+      <Route path="/login" element={<Login />}/>
+      <Route path="/cadastro" element={<Register />}/>
+    </Routes>
   );
 }
 

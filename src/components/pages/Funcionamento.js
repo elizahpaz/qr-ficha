@@ -2,7 +2,7 @@ import styles from './Funcionamento.module.css';
 
 const Funcionamento = () => {
   return (
-    <div className={styles.grandeContainer}>
+    <div id='funcionamento' className={styles.grandeContainer}>
         <h1 className={styles.title}>Como funciona</h1>
 
         <div className={styles.cardContainer}>

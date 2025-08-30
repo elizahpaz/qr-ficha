@@ -1,9 +1,10 @@
-import styles from './Main.module.css'
+import styles from './Home.module.css'
 import Navbar from './Navbar';
 
-export const Main = () => {
+
+const Home = () => {
   return (
-    <div className={styles.container}>
+    <div id='home' className={styles.container}>
         <Navbar />
 
         <div className={styles.bannerContainer}>
@@ -13,10 +14,9 @@ export const Main = () => {
 
             <button className={styles.button}>TESTE AGORA</button>
         </div>
-        </div>
-       
+        </div>   
     </div>
   )
 }
 
-export default Main;
+export default Home;

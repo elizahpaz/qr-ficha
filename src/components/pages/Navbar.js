@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
-import { FaCommentAlt, FaBars, FaTimes } from 'react-icons/fa';
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { useState } from 'react';
+import { FaBars, FaTimes } from 'react-icons/fa';
 import styles from './Navbar.module.css';
-import Logo from '../assets/logo.png';
+import Logo from '../../assets/logo.png';
 
 
 const Navbar = () => {
@@ -27,12 +29,13 @@ const Navbar = () => {
           <FaTimes />
         </button>
         
-        <a href="#">Início</a>
-        <a href="#">Como funciona</a>
-        <a href="#">Contato</a>
-        <a href="#">< FaCommentAlt /></a>
+        <a href="#home">Início</a>
+        <a href="#funcionamento">Como funciona</a>
+        <a href="#contato">Contato</a>
 
-        <button className={styles.button}>Entrar</button>
+        <Link to="/login" className={styles.button}>
+          Entrar
+        </Link>
       </div>
 
     </nav>

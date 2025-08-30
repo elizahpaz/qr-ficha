@@ -3,12 +3,8 @@
     padding: 20px;
 }
 
-.logo {
-    max-width: 100px;
-    max-height: 100px;
-}
-
 .copy {
-    margin-top: 10px;
+    color: var(--bg-cor);
     text-align: center;
+    font-weight: 500;
 }

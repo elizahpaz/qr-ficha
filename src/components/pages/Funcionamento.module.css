@@ -17,7 +17,7 @@
     display: grid;
     gap: 2.5rem;
     max-width: 1200px;
-    margin: 0 auto; /* Centraliza o container de cards */
+    margin: 0 auto; 
 }
 
 .card {
@@ -33,7 +33,7 @@
 }
 
 .card:hover {
-  transform: translateY(-5px); /* Efeito de "subir" no hover */
+  transform: translateY(-5px); 
 }
 
 .card img {
