@@ -5,3 +5,9 @@ verde-escuro: #1A4349
 react-icons: https://react-icons.github.io/react-icons/icons/fa/
 
 api cnpj: https://docs.cnpj.ws/blog/consultar-cnpj-javascript
+
+git add .
+git commit -m "Mensagem descritiva" 
+git push origin main
+
+2wHR2RyQ8br2ncd7

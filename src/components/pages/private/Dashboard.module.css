@@ -1,0 +1,18 @@
+.container {
+    background-color: var(--bg-cor);
+    min-height: 100vh;
+}
+
+.header {
+    background-color: var(--primary-color);
+    text-align: center;
+    padding: 2rem;
+    margin-bottom: 10px;
+}
+
+.userName {
+    text-decoration: none;
+    color: var(--bg-cor);
+    font-weight: 600;
+    font-size: 1.5rem;
+}

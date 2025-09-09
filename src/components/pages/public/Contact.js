@@ -1,6 +1,6 @@
 import styles from './Contact.module.css';
-import Input from '../form/Input';
-import SubmitButton from '../form/SubmitButton';
+import Input from '../../form/Input';
+import SubmitButton from '../../form/SubmitButton';
 
 const Contact = () => {
   return (

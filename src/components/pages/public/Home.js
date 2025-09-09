@@ -1,5 +1,6 @@
 import styles from './Home.module.css'
 import Navbar from './Navbar';
+import { Link } from 'react-router-dom';
 
 
 const Home = () => {
@@ -12,7 +13,7 @@ const Home = () => {
             <h1>QR FICHA</h1>
             <p>A solução digital para pagamentos em eventos comunitários!</p>
 
-            <button className={styles.button}>TESTE AGORA</button>
+            <Link to="/cadastro" className={styles.button}>TESTE AGORA</Link>
         </div>
         </div>   
     </div>

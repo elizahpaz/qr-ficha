@@ -1,4 +1,4 @@
-@import url('../../styles/_variables.css');
+@import url('../../../styles/_variables.css');
 
 nav {
   background-color: var(--bg-cor);
@@ -39,13 +39,13 @@ nav {
   border-radius: 50px;
   cursor: pointer;
   font-weight: 550;
-  color: var(--bg-cor);
   font-size: 1rem;
   transition: all 0.3s ease;
 }
 
 .button:hover {
   background-color: var(--secondary-color);
+  color: var(--bg-cor);
   transform: translateY(-3px); 
   box-shadow: 0 12px 25px rgba(0, 0, 0, 0.3);
 }

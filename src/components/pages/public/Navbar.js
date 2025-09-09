@@ -1,9 +1,8 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
 import { FaBars, FaTimes } from 'react-icons/fa';
 import styles from './Navbar.module.css';
-import Logo from '../../assets/logo.png';
+import Logo from '../../../assets/logo.png';
 
 
 const Navbar = () => {

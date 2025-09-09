@@ -1,0 +1,72 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  overflow: hidden; 
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+}
+
+.imageContainer {
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+}
+
+.coverImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cardContent {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.eventName {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.buttonContainer {
+  display: flex;
+  gap: 0.5rem; 
+}
+
+.button {
+  padding: 0.75rem 1.5rem;
+  border: 1px solid #3B82F6;
+  background-color: #3B82F6;
+  color: white;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.button:hover {
+  background-color: #2563EB;
+}
+
+.secondaryButton {
+  background-color: transparent;
+  color: #3B82F6;
+}
+
+.secondaryButton:hover {
+  background-color: #EBF1F8;
+}
+
+@media (max-width: 480px) {
+  .imageContainer {
+    height: 150px;
+  }
+}
