@@ -54,7 +54,7 @@ nav {
   display: none;
 }
 
-/* Media Query para telas menores */
+/* Media Query*/
 @media (max-width: 768px) {
   .navbar {
     flex-direction: row;

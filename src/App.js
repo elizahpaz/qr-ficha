@@ -6,6 +6,8 @@ import LandingPage from "./components/pages/public/LandingPage";
 import Login from './components/pages/public/Login';
 import Register from './components/pages/public/Register';
 import CadastroEvento from './components/eventos/CadastroEvento';
+import AddItem from './components/eventos/AddItem';
+import Perfil from './components/pages/private/Perfil';
 import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
@@ -18,6 +20,8 @@ function App() {
       <Route element={<ProtectedRoute />}>
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/cadastroEvento" element={<CadastroEvento />} />
+        <Route path="/add-itens/:idEvento" element={<AddItem />} />
+        <Route path="/perfil" element={<Perfil />} />
       </Route>
 
       <Route path="*" element={<h1>404 - Página não encontrada</h1>} />

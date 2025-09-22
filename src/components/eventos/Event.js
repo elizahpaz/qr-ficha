@@ -1,24 +1,35 @@
+import { Link } from 'react-router-dom';
 import styles from './Event.module.css';
 
-import defaultImage from '../../assets/dafault-event.jpg';
+const Event = ({ evento, onUpdateStatus }) => {
+  //URL para a equipe da organização /team-view
+  const eventUrl = "https://www.exemplo.com.br/evento/" + evento.id;
 
-function Event({ coverImage, name, buttonText1, buttonText2 }) {
-  const imageToDisplay = coverImage || defaultImage;
+  const handleButtonClick = () => {
+    onUpdateStatus(evento.id, !evento.status);
+  };
 
   return (
-    <div className={styles.card}>
-      <div className={styles.imageContainer}>
-        <img src={imageToDisplay} alt={`Capa do evento ${name}`} className={styles.coverImage} />
-      </div>
-      <div className={styles.cardContent}>
-        <h3 className={styles.eventName}>{name}</h3>
-        <div className={styles.buttonContainer}>
-          <button className={styles.button}>{buttonText1}</button>
-          <button className={`${styles.button} ${styles.secondaryButton}`}>{buttonText2}</button>
-        </div>
-      </div>
+    <div className={styles.container}>
+      <h3>{evento.nome}</h3>
+      
+      <button onClick={handleButtonClick}>
+        {evento.status ? 'Finalizar' : 'Iniciar'}
+      </button>
+
+      {evento.status ? (
+        // Se o status for TRUE (iniciado), exibe a URL a ser compartilhada c/ equipe
+        <span className={styles.urlText}>
+          Link de acesso: <a href={eventUrl} target="_blank" rel="noopener noreferrer">{eventUrl}</a>
+        </span>
+      ) : (
+        // Se o status for FALSE (não iniciado), exibe o Link de Editar
+        <Link to={`/add-itens/${evento.id}`} className={styles.button}>
+          Editar
+        </Link>
+      )}
     </div>
   );
-}
+};
 
 export default Event;

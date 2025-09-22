@@ -45,7 +45,7 @@ const Register = () => {
         if (data.razao_social) {
             setRazaoSocial(data.razao_social);
         } else {
-            throw new Error('Dados incompletos da API. Tente novamente.');
+            throw new Error('Dados incompletos. Tente novamente.');
         }
 
         } catch (err) {
@@ -100,45 +100,38 @@ const Register = () => {
   return (
 
     <div className={styles.container}>        
-        <div className={styles.formSection}>
-            <div className={styles.logo}>
-                <img src={Logo} alt="Logo QR Ficha" />
-            </div>
-            <h2 className={styles.title}>Cadastrar</h2>
-            <form className={styles.loginForm} onSubmit={handleRegister}>
-            <div className={styles.inputGroup}>
-                <Input type="text" id="cnpj"
-                    text="CNPJ"
-                    name="cnpj"
-                    placeholder="00.000.000/0000-00"
-                    value={cnpj}
-                    onChange={(e) => setCnpj(e.target.value)}
-                    onBlur={fetchCnpjData}
-                    maxLength="18"
-                required
-                />
-                {loadingCnpj && <p>Buscando dados...</p>}
-                {error && <p>{error}</p>}
-
-                <Input className={styles.disabled} type="text" id="razaoSocial" text="Nome" name="nome" placeholder="Informe o CNPJ" value={razaoSocial}
-                onChange={(e) => setRazaoSocial(e.target.value)} required
-                readOnly={loadingCnpj || cnpjValidado} />
-
-                <Input type="email" id="email" text="E-mail" name="email" placeholder="seuemail@gmail.com"
-                value={email} onChange={(e) => setEmail(e.target.value)} required />
-
-                <Input id="password" text="Senha"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required />
-            </div>
-            <SubmitButton text={"Cadastrar"} type="submit" disabled={isLoading || loadingCnpj || !cnpjValidado}/>
-            {error && <p style={{ color: 'red' }}>{error}</p>}
-
-            <Link to="/login" className={styles.link}>Já tem cadastro? Entre na sua conta!</Link>
-            </form>
+      <div className={styles.formSection}>
+        <div className={styles.logo}>
+          <img src={Logo} alt="Logo QR Ficha" />
         </div>
+        <h2 className={styles.title}>Cadastrar</h2>
+        <form className={styles.loginForm} onSubmit={handleRegister}>
+        <div className={styles.inputGroup}>
+          <Input type="text" id="cnpj" text="CNPJ" placeholder="00.000.000/0000-00" value={cnpj}
+          onChange={(e) => setCnpj(e.target.value)}
+          onBlur={fetchCnpjData}
+          maxLength="18" required />
+          {loadingCnpj && <p>Buscando dados...</p>}
+          {error && <p>{error}</p>}
+
+          <Input className={styles.disabled} type="text" id="razaoSocial" text="Nome"
+          placeholder="Informe o CNPJ" value={razaoSocial}
+          onChange={(e) => setRazaoSocial(e.target.value)} required
+          readOnly={loadingCnpj || cnpjValidado} />
+
+          <Input type="email" id="email" text="E-mail" placeholder="seuemail@gmail.com"
+          value={email} onChange={(e) => setEmail(e.target.value)} required />
+
+          <Input id="password" text="Senha" type="password" value={password}
+          onChange={(e) => setPassword(e.target.value)} required />
+        </div>
+        
+          <SubmitButton text={"Cadastrar"} type="submit" disabled={isLoading || loadingCnpj || !cnpjValidado}/>
+          {error && <p style={{ color: 'red' }}>{error}</p>}
+
+          <Link to="/login" className={styles.link}>Já tem cadastro? Entre na sua conta!</Link>
+        </form>
+      </div>
     </div>
   )
 }

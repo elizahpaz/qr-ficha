@@ -1,0 +1,40 @@
+.container {
+    padding: 10px;
+}
+
+.title {
+    text-align: center;
+    color: var(--primary-color);
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+}
+
+.form {
+    background-color: var(--off-white);
+    border-radius: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 10px;
+}
+
+.btnSection {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    align-items: center;
+    justify-content: space-between;
+}
+
+button {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 1.2rem;
+    font-size: 1rem;
+    cursor: pointer;
+    white-space: nowrap;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+}

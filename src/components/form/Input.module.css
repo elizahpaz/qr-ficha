@@ -7,7 +7,7 @@
 .form_control label {
     display: block;
     font-size: 0.9rem;
-    color: #333;
+    color: #000000;
     margin-bottom: 0.5rem;
     font-weight: 500;
 }
@@ -17,11 +17,11 @@
     border: none;
     width: 100%;
     padding: 1rem;
-    border: 1px solid var(--off-white);
+    border: 1px solid #8f8f8f;
     border-radius: 8px;
     font-family: inherit;
     font-size: 1rem;
-    color: #333;
+    color: #000000;
     transition: border-color 0.3s ease;
 }
 
@@ -32,4 +32,8 @@
 .form_control input:focus {
     outline: none;
     border-color: var(--primary-color);
+}
+
+.form_control input:disabled {
+  background-color: #cccccc;
 }

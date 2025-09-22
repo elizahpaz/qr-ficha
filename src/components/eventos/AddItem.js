@@ -1,93 +1,178 @@
-import { useState } from 'react';
-import { supabase } from '../supabaseClient';
-import './AddItem.module.css';
+import { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { supabase } from '../../database/supabaseClient';
+import CardItem from './CardItem';
+import SubmitButton from '../form/SubmitButton';
+import styles from './AddItem.module.css';
+import { RiAddLargeFill } from 'react-icons/ri';
 
 function AddItem() {
-  const [nome, setNome] = useState('');
-  const [preco, setPreco] = useState('');
+  const { idEvento } = useParams();
+  const [eventName, setEventName] = useState('');
+  const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState('');
+  const navigate = useNavigate();
 
-  async function handleAddItem(e) {
-    e.preventDefault();
-    setLoading(true);
-    setError(null);
-    setSuccess(false);
+  useEffect(() => {
+    loadEventData();
+  }, [idEvento]);
+
+  const loadEventData = async () => {
+    if (!idEvento) return;
 
     try {
-      const { data, error: insertError } = await supabase
-        .from('Item') 
-        .insert([
-          {
-            nome: nome,
-            valor: valor,
-          },
-        ]);
+      const { data: eventData, error: eventError } = await supabase
+        .from('Evento')
+        .select('nome')
+        .eq('id', idEvento)
+        .single();
 
-      if (insertError) {
-        throw new Error(insertError.message);
-      }
+      if (eventError) throw eventError;
+      setEventName(eventData.nome);
 
-      setSuccess(true);
-      setNome('');
-      setFoto('');
-      setPreco('');
-      console.log('Item cadastrado:', data);
+      const { data: itemsData, error: itemsError } = await supabase
+        .from('Item')
+        .select('*')
+        .eq('id_evento', idEvento);
+
+      if (itemsError) throw itemsError;
+      
+      const formattedItems = itemsData.map(item => ({
+        id: item.id,
+        id_evento: item.id_evento,
+        nome_item: item.nome,
+        preco: item.valor
+      }));
+
+      setItems(formattedItems);
 
     } catch (err) {
-      setError(err.message);
-      console.error('Erro ao cadastrar item:', err);
+      setError('Erro ao carregar dados: ' + err.message);
+    }
+  };
+
+  const handleAddItem = () => {
+    const tempId = Date.now() + Math.random();
+    setItems(prev => [...prev, { 
+      id: tempId, 
+      id_evento: idEvento, 
+      nome_item: '', 
+      preco: ''
+    }]);
+  };
+
+  const handleRemoveItem = async (itemId) => {
+    try {
+      // Tenta deletar do banco (se existir)
+      await supabase
+        .from('Item')
+        .delete()
+        .eq('id', itemId);
+
+      // Remove da lista local
+      setItems(prev => prev.filter(item => item.id !== itemId));
+    } catch (err) {
+      setError('Erro ao remover item: ' + err.message);
+    }
+  };
+  
+  const handleUpdateItem = (updatedItem) => {
+    setItems(prev => prev.map(item => 
+      item.id === updatedItem.id ? updatedItem : item
+    ));
+  };
+
+  const handleFinalizar = async () => {
+    setLoading(true);
+    setError('');
+
+    try {
+      // Salva todos os itens
+      await supabase
+        .from('Item')
+        .delete()
+        .eq('id_evento', idEvento);
+
+      const itensParaSalvar = items.map(item => ({
+        id_evento: idEvento,
+        nome: item.nome_item,
+        valor: item.preco
+      }));
+
+      const { error } = await supabase
+        .from('Item')
+        .insert(itensParaSalvar);
+
+      if (error) throw error;
+
+      navigate('/dashboard');
+    } catch (err) {
+      setError('Erro ao salvar: ' + err.message);
     } finally {
       setLoading(false);
     }
-  }
+  };
+
+  const handleExcluirEvento = async () => {
+    if (!window.confirm(`Tem certeza que deseja excluir o evento "${eventName}" e todos os seus itens? Esta ação não pode ser desfeita.`)) {
+      return;
+    }
+
+    setLoading(true);
+    setError('');
+
+    try {
+      await supabase
+        .from('Item')
+        .delete()
+        .eq('id_evento', idEvento);
+
+      const { error } = await supabase
+        .from('Evento')
+        .delete()
+        .eq('id', idEvento);
+
+      if (error) throw error;
+
+      alert('Evento excluído com sucesso!');
+      navigate('/dashboard');
+    } catch (err) {
+      setError('Erro ao excluir evento: ' + err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <div className="card-container">
-      <form onSubmit={handleCreateItem} className="card-form">
-        <h2>Cadastrar Novo Item</h2>
-        
-        <div className="form-group">
-          <label htmlFor="nome">Nome do Item</label>
-          <input
-            id="nome"
-            type="text"
-            value={nome}
-            onChange={(e) => setNome(e.target.value)}
-            required
-          />
-        </div>
+    <div className={styles.container}>
+      <h2 className={styles.title}>ITENS DO EVENTO:</h2>
+      <h2 className={styles.title}>{eventName}</h2>
+      
+      {error && <div className={styles.error}>{error}</div>}
+      
+      {items.map((item) => (
+        <CardItem
+          key={item.id}
+          id={item.id}
+          initialData={item}
+          onUpdate={handleUpdateItem}
+          onRemove={handleRemoveItem}
+        />
+      ))}
 
-        <div className="form-group">
-          <label htmlFor="foto">URL da Foto</label>
-          <input
-            id="foto"
-            type="url"
-            value={foto}
-            onChange={(e) => setFoto(e.target.value)}
-            required
-          />
-        </div>
+      <button className={styles.addItem} onClick={handleAddItem} disabled={loading}>
+        <RiAddLargeFill className={styles.icon} />
+      </button>
 
-        <div className="form-group">
-          <label htmlFor="preco">Preço</label>
-          <input
-            id="preco"
-            type="number"
-            value={preco}
-            onChange={(e) => setPreco(e.target.value)}
-            required
-          />
-        </div>
-
-        <button type="submit" disabled={loading}>
-          {loading ? 'Cadastrando...' : 'Cadastrar Item'}
+      <div className={styles.actionButtons}>
+        <button className={styles.deleteEventButton} onClick={handleExcluirEvento} disabled={loading}>
+          EXCLUIR EVENTO
         </button>
 
-        {error && <p className="error-message">{error}</p>}
-        {success && <p className="success-message">Item cadastrado com sucesso!</p>}
-      </form>
+        <SubmitButton text={loading ? "Salvando..." : "SALVAR"} type="submit" 
+          onClick={handleFinalizar} disabled={loading || items.length === 0} />
+      </div>
     </div>
   );
 }

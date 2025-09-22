@@ -53,12 +53,13 @@ const Login = () => {
           onChange={(e) => setPassword(e.target.value)} required />
           <a href="#" className={styles.link}>Esqueci a senha</a>
         </div>
+        
         <SubmitButton text={"Entrar"} type="submit" disabled={loading}/>
 
         {error && <p style={{ color: 'red' }}>{error}</p>}
         <Link to="/cadastro" className={styles.link}>
-      Não tem cadastro? Faça agora!
-    </Link>
+        Não tem cadastro? Faça agora!
+        </Link>
         </form>
       </div>
     </div>

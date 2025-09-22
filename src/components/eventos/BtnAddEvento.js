@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { RiAddLargeFill } from 'react-icons/ri'; // Certifique-se de ter instalado react-icons
+import { RiAddLargeFill } from 'react-icons/ri';
 import styles from './BtnAddEvento.module.css'; 
 
 const AddEvento = () => {
