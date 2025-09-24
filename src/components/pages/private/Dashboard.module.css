@@ -16,3 +16,14 @@
     font-weight: 600;
     font-size: 1.5rem;
 }
+
+.qrCode {
+    background-color: var(--primary-color);
+    padding: 20px;
+    color: var(--bg-cor);
+    border-radius: 50%;
+    font-size: 50px;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+}

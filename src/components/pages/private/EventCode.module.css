@@ -1,0 +1,158 @@
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+  font-family: Arial, sans-serif;
+}
+
+.loading {
+  text-align: center;
+  padding: 2rem;
+  font-size: 1.2rem;
+}
+
+.qrSection {
+  text-align: center;
+  margin-bottom: 2rem;
+  padding: 2rem;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+}
+
+.qrContainer {
+  margin: 1rem 0;
+  padding: 1rem;
+  background-color: white;
+  border-radius: 8px;
+  display: inline-block;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.qrImage {
+  width: 300px;
+  height: 300px;
+  border: 2px solid #ddd;
+}
+
+.actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.downloadBtn, .printBtn {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s;
+}
+
+.downloadBtn {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.downloadBtn:hover {
+  background-color: #45a049;
+}
+
+.printBtn {
+  background-color: #2196F3;
+  color: white;
+}
+
+.printBtn:hover {
+  background-color: #1976D2;
+}
+
+.instructions {
+  margin: 2rem 0;
+  padding: 1.5rem;
+  background-color: #e8f4fd;
+  border-radius: 8px;
+  border-left: 4px solid #2196F3;
+}
+
+.instructions h3 {
+  margin-top: 0;
+  color: #1976D2;
+}
+
+.instructionsList p {
+  margin: 0.5rem 0;
+  padding: 0.5rem 0;
+}
+
+.alert {
+  margin: 2rem 0;
+  padding: 1.5rem;
+  background-color: #fff3cd;
+  border-radius: 8px;
+  border-left: 4px solid #ffc107;
+}
+
+.alert h4 {
+  margin-top: 0;
+  color: #856404;
+}
+
+.alert ul {
+  margin: 1rem 0;
+  padding-left: 1.5rem;
+}
+
+.alert li {
+  margin: 0.5rem 0;
+}
+
+.urlInfo {
+  margin: 2rem 0;
+  padding: 1.5rem;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #dee2e6;
+}
+
+.urlInfo h4 {
+  margin-top: 0;
+  color: #495057;
+}
+
+.url {
+  display: block;
+  background-color: #e9ecef;
+  padding: 0.75rem;
+  border-radius: 4px;
+  font-family: 'Courier New', monospace;
+  word-break: break-all;
+  margin: 0.5rem 0;
+}
+
+.urlDescription {
+  font-size: 0.9rem;
+  color: #6c757d;
+  margin: 0.5rem 0 0 0;
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+  
+  .qrImage {
+    width: 250px;
+    height: 250px;
+  }
+  
+  .actions {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .downloadBtn, .printBtn {
+    width: 200px;
+  }
+}
