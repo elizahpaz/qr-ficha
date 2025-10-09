@@ -1,205 +1,374 @@
-import { Link } from "react-router-dom";
+import { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
+import { supabase } from '../../../database/supabaseClient';
+import Scanner from './Scanner';
+import Recarga from './Recarga';
 
 const TeamView = () => {
-  const { eventId } = useParams(); // Pegar da URL /team-view/:eventId
+  const { teamToken } = useParams();
+  const [eventoValido, setEventoValido] = useState(null);
   const [fichaEscaneada, setFichaEscaneada] = useState(null);
-  const [isScanning, setIsScanning] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [telaAtual, setTelaAtual] = useState('menu_inicial'); // 'menu_inicial', 'scanner', 'ficha_escaneada', 'recarga'
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
-  const handleQRScan = async (qrResult) => {
+  useEffect(() => {
+    async function validarAcesso() {
+      try {
+        const { data: evento, error } = await supabase
+          .from('Evento')
+          .select('*')
+          .eq('team_token', teamToken)
+          .eq('status', true)
+          .single();
+
+        if (error || !evento) {
+          setError('Link inválido ou evento não está mais ativo');
+        } else {
+          setEventoValido(evento);
+        }
+      } catch (error) {
+        setError('Erro ao verificar acesso');
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    if (teamToken) {
+      validarAcesso();
+    } else {
+      setError('Token de acesso não fornecido');
+      setLoading(false);
+    }
+  }, [teamToken]);
+
+  const handleQRCodeRead = async (qrData) => {
     try {
       setLoading(true);
       
-      // Parse do QR Code
-      const qrData = JSON.parse(qrResult);
+      const dadosQR = JSON.parse(qrData);
       
-      if (qrData.type !== 'ficha_digital') {
-        alert('QR Code inválido');
+      if (dadosQR.type !== 'ficha_digital') {
+        alert('QR Code inválido para este sistema');
+        setTelaAtual('menu_inicial');
         return;
       }
 
       // Buscar dados da ficha no evento atual
       const { data: fichaEventoData, error } = await supabase
         .from('fichaEvento')
-        .select(`
-          *,
-          Ficha (
-            id,
-            qr-code
-          )
-        `)
-        .eq('id_ficha', qrData.fichaId)
-        .eq('id_evento', eventId)
+        .select('*')
+        .eq('id_ficha', dadosQR.fichaId)
+        .eq('id_evento', eventoValido.id)
         .single();
 
-      if (error || !fichaEventoData) {
+      if (error) {
+        console.error('Erro ao buscar ficha:', error);
+        throw error;
+      }
+
+      if (!fichaEventoData) {
         alert('Ficha não encontrada neste evento');
+        setTelaAtual('menu_inicial');
         return;
       }
 
       setFichaEscaneada(fichaEventoData);
+      setTelaAtual('ficha_escaneada');
 
     } catch (error) {
       console.error('Erro ao processar QR Code:', error);
-      alert('QR Code inválido');
-    } finally {
-      setLoading(false);
-      setIsScanning(false);
-    }
-  };
-
-  const processarRecarga = async (valor) => {
-    if (!fichaEscaneada || valor <= 0) return;
-
-    try {
-      setLoading(true);
-      
-      const novoSaldo = fichaEscaneada.saldo + valor;
-
-      // Atualizar saldo na fichaEvento
-      const { error: updateError } = await supabase
-        .from('fichaEvento')
-        .update({ saldo: novoSaldo })
-        .eq('id', fichaEscaneada.id);
-
-      if (updateError) throw updateError;
-
-      // Registrar transação (opcional - criar tabela Transacao)
-      await supabase
-        .from('Transacao')
-        .insert({
-          id_ficha_evento: fichaEscaneada.id,
-          tipo: 'recarga',
-          valor: valor,
-          saldo_anterior: fichaEscaneada.saldo,
-          saldo_atual: novoSaldo,
-          created_at: new Date().toISOString()
-        });
-
-      setFichaEscaneada({ ...fichaEscaneada, saldo: novoSaldo });
-      alert(`Recarga de R$ ${valor.toFixed(2)} processada com sucesso!`);
-
-    } catch (error) {
-      console.error('Erro ao processar recarga:', error);
-      alert('Erro ao processar recarga');
+      alert('QR Code inválido ou erro ao processar');
+      setTelaAtual('menu_inicial');
     } finally {
       setLoading(false);
     }
   };
 
-  const processarVenda = async (valor) => {
-    if (!fichaEscaneada || valor <= 0) return;
-
-    if (fichaEscaneada.saldo < valor) {
-      alert('Saldo insuficiente!');
-      return;
-    }
-
-    try {
-      setLoading(true);
-      
-      const novoSaldo = fichaEscaneada.saldo - valor;
-
-      const { error: updateError } = await supabase
-        .from('fichaEvento')
-        .update({ saldo: novoSaldo })
-        .eq('id', fichaEscaneada.id);
-
-      if (updateError) throw updateError;
-
-      await supabase
-        .from('Transacao')
-        .insert({
-          id_ficha_evento: fichaEscaneada.id,
-          tipo: 'venda',
-          valor: valor,
-          saldo_anterior: fichaEscaneada.saldo,
-          saldo_atual: novoSaldo,
-          created_at: new Date().toISOString()
-        });
-
-      setFichaEscaneada({ ...fichaEscaneada, saldo: novoSaldo });
-      alert(`Venda de R$ ${valor.toFixed(2)} processada com sucesso!`);
-
-    } catch (error) {
-      console.error('Erro ao processar venda:', error);
-      alert('Erro ao processar venda');
-    } finally {
-      setLoading(false);
-    }
+  // Navegação
+  const voltarParaMenu = () => {
+    setTelaAtual('menu_inicial');
+    setFichaEscaneada(null);
   };
+
+  const abrirScanner = () => {
+    setTelaAtual('scanner');
+  };
+
+  const abrirRecarga = () => {
+    setTelaAtual('recarga');
+  };
+
+  const fecharScanner = () => {
+    setTelaAtual('menu_inicial');
+  };
+
+  const handleRecargaSuccess = (fichaAtualizada) => {
+    setFichaEscaneada(fichaAtualizada);
+    voltarParaMenu();
+  };
+
+  const handleVoltarDeRecarga = () => {
+    setTelaAtual('ficha_escaneada');
+  };
+
+  if (loading && !eventoValido) {
+    return (
+      <div style={{ 
+        padding: '2rem', 
+        textAlign: 'center',
+        minHeight: '50vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
+      }}>
+        <div>
+          <div style={{
+            width: '50px',
+            height: '50px',
+            border: '5px solid #f3f3f3',
+            borderTop: '5px solid #4CAF50',
+            borderRadius: '50%',
+            animation: 'spin 1s linear infinite',
+            margin: '0 auto 1rem auto'
+          }}></div>
+          <p>Verificando acesso...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div style={{ 
+        padding: '2rem', 
+        textAlign: 'center',
+        minHeight: '50vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
+      }}>
+        <div style={{
+          maxWidth: '400px',
+          padding: '2rem',
+          border: '2px solid #f44336',
+          borderRadius: '8px',
+          backgroundColor: '#ffebee'
+        }}>
+          <h2 style={{ color: '#c62828', margin: '0 0 1rem 0' }}>
+            🚫 Acesso Negado
+          </h2>
+          <p style={{ margin: '0 0 1rem 0', color: '#666' }}>{error}</p>
+          <p style={{ margin: '0', fontSize: '0.9rem', color: '#999' }}>
+            Solicite um novo link à organização do evento.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div>
-      <h2>Sistema da Equipe</h2>
-      
-      {!fichaEscaneada ? (
-        <div>
-          <button 
-            onClick={() => setIsScanning(true)} 
-            disabled={loading || isScanning}
+    <div style={{ 
+      padding: '1rem', 
+      maxWidth: '600px', 
+      margin: '0 auto',
+      minHeight: '100vh'
+    }}>
+      {/* HEADER */}
+      <header style={{ 
+        textAlign: 'center', 
+        marginBottom: '2rem',
+        padding: '1.5rem',
+        backgroundColor: '#f8f9fa',
+        borderRadius: '12px',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+      }}>
+        <h1 style={{ 
+          margin: '0 0 0.5rem 0', 
+          color: '#2c3e50',
+          fontSize: '1.8rem'
+        }}>
+          🎪 Sistema da Equipe
+        </h1>
+        <h2 style={{ 
+          margin: '0', 
+          color: '#7f8c8d', 
+          fontSize: '1.2rem',
+          fontWeight: 'normal'
+        }}>
+          {eventoValido.nome}
+        </h2>
+      </header>
+
+      {/* TELA: MENU INICIAL */}
+      {telaAtual === 'menu_inicial' && (
+        <div style={{ textAlign: 'center' }}>
+          <button
+            onClick={abrirScanner}
+            style={{
+              padding: '1.5rem 2rem',
+              backgroundColor: '#4CAF50',
+              color: 'white',
+              border: 'none',
+              borderRadius: '12px',
+              fontSize: '1.3rem',
+              fontWeight: 'bold',
+              cursor: 'pointer',
+              width: '100%',
+              maxWidth: '300px',
+              boxShadow: '0 4px 12px rgba(76, 175, 80, 0.3)',
+              transition: 'all 0.2s'
+            }}
+            onMouseOver={(e) => e.target.style.transform = 'translateY(-2px)'}
+            onMouseOut={(e) => e.target.style.transform = 'translateY(0)'}
           >
-            {isScanning ? 'Escaneando...' : 'Escanear QR Code da Ficha'}
+            📱 Escanear Ficha
           </button>
-          
-          {isScanning && (
-            <div>
-              {/* Implementar scanner aqui */}
-              <p>Aponte a câmera para o QR Code da ficha</p>
-              <button onClick={() => setIsScanning(false)}>Cancelar</button>
-              
-              {/* Simulação - remover em produção */}
-              <div style={{ marginTop: '1rem', padding: '1rem', backgroundColor: '#f0f0f0' }}>
-                <p><strong>SIMULAÇÃO:</strong></p>
-                <button onClick={() => handleQRScan(JSON.stringify({fichaId: 'test-123', type: 'ficha_digital'}))}>
-                  Simular Scan
-                </button>
-              </div>
-            </div>
-          )}
         </div>
-      ) : (
+      )}
+
+      {/* TELA: SCANNER */}
+      {telaAtual === 'scanner' && (
+        <Scanner 
+          onQRCodeRead={handleQRCodeRead}
+          onClose={fecharScanner}
+        />
+      )}
+
+      {/* TELA: FICHA ESCANEADA */}
+      {telaAtual === 'ficha_escaneada' && fichaEscaneada && (
         <div>
-          <div style={{ padding: '1rem', backgroundColor: '#e8f5e8', borderRadius: '8px', marginBottom: '1rem' }}>
-            <h3>Ficha Escaneada</h3>
-            <p><strong>Titular:</strong> {fichaEscaneada.titular}</p>
-            <p><strong>Contato:</strong> {fichaEscaneada.contato}</p>
-            <p><strong>Saldo Atual:</strong> R$ {fichaEscaneada.saldo.toFixed(2)}</p>
+          <div style={{ 
+            backgroundColor: '#e8f5e8', 
+            padding: '1.5rem', 
+            borderRadius: '12px', 
+            marginBottom: '2rem',
+            border: '2px solid #4CAF50',
+            boxShadow: '0 2px 8px rgba(76, 175, 80, 0.2)'
+          }}>
+            <h3 style={{ 
+              color: '#2e7d32', 
+              margin: '0 0 1rem 0',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem'
+            }}>
+              ✅ Ficha Identificada
+            </h3>
+            <div style={{ fontSize: '1.1rem' }}>
+              <p style={{ margin: '0.5rem 0' }}>
+                <strong>Cliente:</strong> {fichaEscaneada.nome_titular}
+              </p>
+              <p style={{ margin: '0.5rem 0' }}>
+                <strong>Contato:</strong> {fichaEscaneada.contato}
+              </p>
+              <p style={{ margin: '0.5rem 0' }}>
+                <strong>Saldo:</strong> 
+                <span style={{ 
+                  color: fichaEscaneada.saldo > 0 ? '#2e7d32' : '#d32f2f',
+                  fontWeight: 'bold',
+                  fontSize: '1.2rem'
+                }}>
+                  {' '}R$ {fichaEscaneada.saldo.toFixed(2)}
+                </span>
+              </p>
+            </div>
           </div>
 
-          <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
-            <div style={{ flex: 1 }}>
-              <h4>💰 Recarga</h4>
-              <input type="number" placeholder="Valor" id="valorRecarga" step="0.01" />
-              <button 
-                onClick={() => {
-                  const valor = parseFloat(document.getElementById('valorRecarga').value);
-                  processarRecarga(valor);
-                }}
-                disabled={loading}
-              >
-                {loading ? 'Processando...' : 'Fazer Recarga'}
-              </button>
-            </div>
-
-            <div style={{ flex: 1 }}>
-              <h4>🛒 Venda</h4>
-              <input type="number" placeholder="Valor" id="valorVenda" step="0.01" />
-              <button 
-                onClick={() => {
-                  const valor = parseFloat(document.getElementById('valorVenda').value);
-                  processarVenda(valor);
-                }}
-                disabled={loading}
-              >
-                {loading ? 'Processando...' : 'Processar Venda'}
-              </button>
-            </div>
+          <div style={{ marginBottom: '1.5rem' }}>
+            <button
+              onClick={abrirRecarga}
+              style={{
+                width: '100%',
+                padding: '1.2rem',
+                backgroundColor: '#4CAF50',
+                color: 'white',
+                border: 'none',
+                borderRadius: '8px',
+                fontSize: '1.1rem',
+                fontWeight: 'bold',
+                cursor: 'pointer',
+                boxShadow: '0 2px 8px rgba(76, 175, 80, 0.3)',
+                transition: 'all 0.2s'
+              }}
+              onMouseOver={(e) => {
+                e.target.style.backgroundColor = '#45a049';
+                e.target.style.transform = 'translateY(-2px)';
+              }}
+              onMouseOut={(e) => {
+                e.target.style.backgroundColor = '#4CAF50';
+                e.target.style.transform = 'translateY(0)';
+              }}
+            >
+              💰 Fazer Recarga
+            </button>
           </div>
 
-          <button onClick={() => setFichaEscaneada(null)}>
-            Escanear Outra Ficha
+          <button
+            onClick={voltarParaMenu}
+            style={{
+              width: '100%',
+              padding: '1rem',
+              backgroundColor: '#6c757d',
+              color: 'white',
+              border: 'none',
+              borderRadius: '8px',
+              fontSize: '1rem',
+              fontWeight: 'bold',
+              cursor: 'pointer',
+              transition: 'all 0.2s'
+            }}
+            onMouseOver={(e) => e.target.style.backgroundColor = '#5a6268'}
+            onMouseOut={(e) => e.target.style.backgroundColor = '#6c757d'}
+          >
+            🔙 Voltar ao Menu
           </button>
+        </div>
+      )}
+
+      {/* TELA: RECARGA */}
+      {telaAtual === 'recarga' && fichaEscaneada && (
+        <Recarga 
+          fichaEscaneada={fichaEscaneada}
+          onRecargaSuccess={handleRecargaSuccess}
+          onVoltar={handleVoltarDeRecarga}
+        />
+      )}
+
+      {/* LOADING OVERLAY */}
+      {loading && telaAtual !== 'menu_inicial' && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0,0,0,0.6)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000
+        }}>
+          <div style={{
+            backgroundColor: 'white',
+            padding: '2rem',
+            borderRadius: '12px',
+            textAlign: 'center',
+            boxShadow: '0 8px 32px rgba(0,0,0,0.3)'
+          }}>
+            <div style={{
+              width: '50px',
+              height: '50px',
+              border: '5px solid #f3f3f3',
+              borderTop: '5px solid #4CAF50',
+              borderRadius: '50%',
+              animation: 'spin 1s linear infinite',
+              margin: '0 auto 1rem auto'
+            }}></div>
+            <p style={{ margin: '0', fontSize: '1.2rem', color: '#333' }}>
+              Processando...
+            </p>
+          </div>
         </div>
       )}
     </div>

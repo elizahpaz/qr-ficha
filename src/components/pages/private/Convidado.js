@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '../../../database/supabaseClient';
 import Input from '../../form/Input';
 import SubmitButton from '../../form/SubmitButton';
-import styles from '../../eventos/AddItem.module.css'
+import styles from '../../eventos/AddItem.module.css';
 
 const Convidado = () => {
   const { idOrg } = useParams();
@@ -36,7 +36,7 @@ const Convidado = () => {
 
         setEventoAtivo(evento);
 
-        // 2. Verificar se há dados salvos localmente
+        // Verificar se há dados salvos localmente
         const dadosSalvos = localStorage.getItem(localStorageKey);
         
         if (dadosSalvos) {
@@ -86,96 +86,105 @@ const Convidado = () => {
   }, [idOrg, localStorageKey]);
 
   const handleCadastro = async (nome, contato) => {
-    try {
-      setLoading(true);
+  try {
+    setLoading(true);
 
-      // 1. Buscar fichas da organização
-      const { data: todasFichas, error: fichasError } = await supabase
+    // Buscar fichas da organização
+    const { data: todasFichas, error: fichasError } = await supabase
+      .from('Ficha')
+      .select('*')
+      .eq('id_org', idOrg);
+
+    if (fichasError) throw fichasError;
+
+    // Buscar fichas já usadas no evento
+    const { data: fichasUsadas, error: usadasError } = await supabase
+      .from('fichaEvento')
+      .select('id_ficha')
+      .eq('id_evento', eventoAtivo.id);
+
+    if (usadasError) throw usadasError;
+
+    // Encontrar ficha livre
+    const idsUsadas = fichasUsadas.map(f => f.id_ficha);
+    let fichaLivre = todasFichas.find(f => !idsUsadas.includes(f.id));
+
+    // Criar nova ficha se necessário
+    if (!fichaLivre) {
+      const { data: novaFicha, error: criarFichaError } = await supabase
         .from('Ficha')
-        .select('*')
-        .eq('id_org', idOrg);
-
-      if (fichasError) throw fichasError;
-
-      // 2. Buscar fichas já usadas no evento
-      const { data: fichasUsadas, error: usadasError } = await supabase
-        .from('fichaEvento')
-        .select('id_ficha')
-        .eq('id_evento', eventoAtivo.id);
-
-      if (usadasError) throw usadasError;
-
-      // 3. Encontrar ficha livre
-      const idsUsadas = fichasUsadas.map(f => f.id_ficha);
-      let fichaLivre = todasFichas.find(f => !idsUsadas.includes(f.id));
-
-      // 4. Criar nova ficha se necessário
-      if (!fichaLivre) {
-        const qrCodeData = JSON.stringify({
-          fichaId: null,
-          orgId: idOrg,
-          type: 'ficha_digital'
-        });
-
-        const { data: novaFicha, error: criarFichaError } = await supabase
-          .from('Ficha')
-          .insert({
-            qr_code: qrCodeData,
-            id_org: idOrg
-          })
-          .select()
-          .single();
-
-        if (criarFichaError) throw criarFichaError;
-        fichaLivre = novaFicha;
-      }
-
-      // 5. Criar registro em fichaEvento
-      const { error: eventoError } = await supabase
-        .from('fichaEvento')
         .insert({
-          id_ficha: fichaLivre.id,
-          id_evento: eventoAtivo.id,
-          nome_titular: nome,
-          contato: contato,
-          saldo: 0
-        });
+          qr_code: '', // Temporário
+          id_org: idOrg
+        })
+        .select()
+        .single();
 
-      if (eventoError) throw eventoError;
+      if (criarFichaError) throw criarFichaError;
 
-      // 6. Gerar QR Code visual
-      const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(fichaLivre.qr_code)}`;
-      
-      // 7. Definir dados da ficha
-      const novaFicha = {
-        id: fichaLivre.id,
-        nome_titular: nome,
-        contato: contato,
-        saldo: 0,
-        qrCode: fichaLivre.qr_code
+      const qrCodeData = JSON.stringify({
+        fichaId: novaFicha.id,
+        orgId: idOrg,
+        type: 'ficha_digital'
+      });
+
+      const { error: updateError } = await supabase
+        .from('Ficha')
+        .update({ qr_code: qrCodeData })
+        .eq('id', novaFicha.id);
+
+      if (updateError) throw updateError;
+
+      fichaLivre = {
+        ...novaFicha,
+        qr_code: qrCodeData
       };
-
-      setFichaAtribuida(novaFicha);
-      setQrCodeUrl(qrUrl);
-
-      // 8. Salvar no localStorage
-      const dadosParaSalvar = {
-        fichaId: fichaLivre.id,
-        eventoId: eventoAtivo.id,
-        nome_titular: nome,
-        contato: contato,
-        qrCode: fichaLivre.qr_code,
-        qrCodeUrl: qrUrl
-      };
-      localStorage.setItem(localStorageKey, JSON.stringify(dadosParaSalvar));
-
-    } catch (error) {
-      console.error('Erro ao processar cadastro:', error);
-      setError('Erro ao processar cadastro');
-    } finally {
-      setLoading(false);
     }
-  };
+
+    const { error: eventoError } = await supabase
+      .from('fichaEvento')
+      .insert({
+        id_ficha: fichaLivre.id,
+        id_evento: eventoAtivo.id,
+        nome_titular: nome,
+        contato: contato,
+        saldo: 0
+      });
+
+    if (eventoError) throw eventoError;
+
+    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(fichaLivre.qr_code)}`;
+    
+    // Definir dados da ficha
+    const novaFicha = {
+      id: fichaLivre.id,
+      nome_titular: nome,
+      contato: contato,
+      saldo: 0,
+      qrCode: fichaLivre.qr_code
+    };
+
+    setFichaAtribuida(novaFicha);
+    setQrCodeUrl(qrUrl);
+
+    // Salvar no localStorage
+    const dadosParaSalvar = {
+      fichaId: fichaLivre.id,
+      eventoId: eventoAtivo.id,
+      nome_titular: nome,
+      contato: contato,
+      qrCode: fichaLivre.qr_code,
+      qrCodeUrl: qrUrl
+    };
+    localStorage.setItem(localStorageKey, JSON.stringify(dadosParaSalvar));
+
+  } catch (error) {
+    console.error('Erro ao processar cadastro:', error);
+    setError('Erro ao processar cadastro');
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div>
@@ -183,7 +192,6 @@ const Convidado = () => {
       
       {error && (
         <div>
-          <h2>Ops!</h2>
           <p>{error}</p>
         </div>
       )}
@@ -208,7 +216,7 @@ const Convidado = () => {
       {fichaAtribuida && eventoAtivo && (
         <div>
           <h2>Sua Ficha Digital</h2>
-          <p><strong>Evento:</strong> {eventoAtivo.nome}</p>
+          <p>Evento:{eventoAtivo.nome}</p>
           <p><strong>Nome:</strong> {fichaAtribuida.nome_titular}</p>
           <p><strong>Saldo:</strong> R$ {fichaAtribuida.saldo.toFixed(2)}</p>
           
@@ -219,8 +227,7 @@ const Convidado = () => {
           <div style={{ marginTop: '1rem', textAlign: 'center' }}>
             <p><strong>Instruções:</strong></p>
             <ul style={{ textAlign: 'left', display: 'inline-block' }}>
-              <li>Apresente este QR Code para fazer recargas</li>
-              <li>Apresente este QR Code para comprar nos stands</li>
+              <li>Apresente este QR Code para fazer recargas e compras</li>
               <li>Atualize a página para ver seu saldo atual</li>
             </ul>
           </div>

@@ -1,19 +1,16 @@
 import { Link } from 'react-router-dom';
-import { useState } from 'react';
 import styles from './Event.module.css';
 
 const Event = ({ evento, onUpdateStatus }) => {
-  const [copied, setCopied] = useState(false);
 
-  // URL para a equipe da organização
-  const eventUrl = `${window.location.origin}/team-view/${evento.id}`;
+  // URL para a equipe do evento
+  const eventUrl = `${window.location.origin}/team-view/${evento.team_token}`;
 
   const handleButtonClick = () => {
     if (evento.status) {
       // Se está ativo, finalizar
       onUpdateStatus(evento.id, false);
     } else {
-      // Se não está ativo, iniciar e mostrar modal
       onUpdateStatus(evento.id, true);
     }
   };

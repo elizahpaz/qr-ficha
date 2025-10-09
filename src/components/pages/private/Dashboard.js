@@ -47,53 +47,63 @@ const Dashboard = () => {
   }, []);
 
   const handleUpdateStatus = async (idEvento, newStatus) => {
-    setLoading(true);
-    
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      const idOrg = session.user.id;
+  setLoading(true);
+  
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    const idOrg = session.user.id;
 
-      if (newStatus) {
-        // Se está iniciando um evento, primeiro finalizar todos os outros
-        await supabase
-          .from('Evento')
-          .update({ status: false })
-          .eq('id_org', idOrg);
-      }
+    if (newStatus) {
+      // Gerar token único para este evento
+      const teamToken = crypto.randomUUID();
 
-      // Atualizar o evento específico
+      // Desativar outros eventos
+      await supabase
+        .from('Evento')
+        .update({ status: false, team_token: null })
+        .eq('id_org', idOrg);
+
       const { error } = await supabase
         .from('Evento')
-        .update({ status: newStatus })
+        .update({ 
+          status: newStatus,
+          team_token: teamToken
+        })
         .eq('id', idEvento);
 
-      if (error) {
-        console.log('Erro ao atualizar status do evento', error);
-        alert('Erro ao atualizar evento');
-        return;
-      }
+      if (error) throw error;
 
-      // Atualizar o estado local
       setEventos(prevEventos =>
         prevEventos.map(evento => {
           if (newStatus && evento.id !== idEvento) {
-            // Se está iniciando um evento, desativar todos os outros
-            return { ...evento, status: false };
+            return { ...evento, status: false, team_token: null };
           } else if (evento.id === idEvento) {
-            // Atualizar o evento específico
-            return { ...evento, status: newStatus };
+            return { ...evento, status: newStatus, team_token: teamToken };
           }
           return evento;
         })
       );
+    } else {
+      const { error } = await supabase
+        .from('Evento')
+        .update({ status: false, team_token: null })
+        .eq('id', idEvento);
 
-    } catch (error) {
-      console.error('Erro ao atualizar status:', error);
-      alert('Erro ao atualizar evento');
-    } finally {
-      setLoading(false);
+      if (error) throw error;
+
+      setEventos(prevEventos =>
+        prevEventos.map(evento => 
+          evento.id === idEvento ? { ...evento, status: false, team_token: null } : evento
+        )
+      );
     }
-  };
+  } catch (error) {
+    console.error('Erro ao atualizar status:', error);
+    alert('Erro ao atualizar evento');
+  } finally {
+    setLoading(false);
+  }
+};
 
   const finalizarEvento = async (eventoId) => {
   try {

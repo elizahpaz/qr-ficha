@@ -13,6 +13,7 @@ import EventCode from './components/pages/private/EventCode';
 import Recarga from './components/pages/private/Recarga';
 import Venda from './components/pages/private/Venda';
 import Convidado from './components/pages/private/Convidado';
+import TeamView from './components/pages/private/TeamView';
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
       <Route path="/login" element={<Login />}/>
       <Route path="/cadastro" element={<Register />}/>
       <Route path="/convidado/:idOrg" element={<Convidado />} />
+      <Route path="/team-view/:teamToken" element={<TeamView />} />
 
       <Route element={<ProtectedRoute />}>
         <Route path="/dashboard" element={<Dashboard />} />
