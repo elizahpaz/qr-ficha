@@ -1,14 +1,14 @@
 .container {
-    background-color: var(--bg-cor);
-    padding: 15px;
-    text-align: center;
+  background-color: var(--bg-cor);
+  padding: 15px;
+  text-align: center;
 }
 
 .title {
-    color: var(--primary-color);
-    text-align: center;
-    font-weight: 600;
-    text-transform: uppercase;
+  color: var(--primary-color);
+  text-align: center;
+  font-weight: 600;
+  text-transform: uppercase;
 }
 
 .addItem {
@@ -34,4 +34,97 @@
   padding: 1.5rem;
   max-width: 600px; 
   margin: 1.5rem auto;
+}
+
+.actionButtons {
+  display: flex;
+  gap: 15px; 
+  margin: auto;
+  margin-top: 20px;
+  padding: 10px;
+  width: 600px;
+  box-sizing: border-box;
+}
+
+.deleteEventButton {
+  flex-grow: 1; 
+  flex-shrink: 0;
+  flex-basis: 0;
+}
+
+
+.actionButtons :global(.SubmitButton) {
+  flex-grow: 2; 
+  flex-shrink: 0;
+  flex-basis: 0;
+}
+
+/*Estilo específico de Convidado.js*/
+.fichaContainer {
+  max-width: 400px;
+  margin: 20px auto;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1); 
+  text-align: center; 
+}
+
+.infoText {
+  color: var(--color-text-dark, #333);
+  font-size: 1rem;
+  margin: 5px 0;
+}
+
+.saldoText {
+  color: var(--color-text-dark, #333);
+  font-size: 1.1rem;
+  margin: 15px 0 25px;
+  font-weight: 600;
+}
+
+.saldoValue {
+  color: var(--secondary-color);
+  font-size: 1.1rem;
+  display: inline-block;
+  margin-left: 5px;
+}
+.qrCodeWrapper {
+  padding: 15px;
+  background-color: var(--color-light-gray, #f8f9fa);
+  border: 1px solid var(--color-border, #e9ecef);
+  border-radius: 8px;
+  margin-bottom: 25px;
+  display: inline-block;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.qrCodeWrapper img {
+  display: block;
+  max-width: 100%; 
+  height: auto;
+}
+
+.instructions {
+  text-align: left;
+  border-top: 1px solid var(--off-white);
+  padding-top: 15px;
+}
+
+.instructionsTitle {
+  color: var(--primary-color);
+  font-size: 1rem;
+  font-weight: 600;
+  margin-top: 0;
+  margin-bottom: 10px;
+}
+
+.instructionsList {
+  padding: 0;
+  margin: 0;
+}
+
+.instructionsList li {
+  font-size: 0.9rem;
+  margin-bottom: 8px;
+  position: relative;
 }

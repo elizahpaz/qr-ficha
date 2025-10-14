@@ -54,7 +54,6 @@ const Convidado = () => {
                 .single();
 
               if (!fichaError && fichaAtualizada) {
-                // Restaurar dados com saldo atualizado
                 setFichaAtribuida({
                   id: fichaLocal.fichaId,
                   nome_titular: fichaLocal.nome_titular,
@@ -89,7 +88,6 @@ const Convidado = () => {
   try {
     setLoading(true);
 
-    // Buscar fichas da organização
     const { data: todasFichas, error: fichasError } = await supabase
       .from('Ficha')
       .select('*')
@@ -97,7 +95,6 @@ const Convidado = () => {
 
     if (fichasError) throw fichasError;
 
-    // Buscar fichas já usadas no evento
     const { data: fichasUsadas, error: usadasError } = await supabase
       .from('fichaEvento')
       .select('id_ficha')
@@ -105,16 +102,14 @@ const Convidado = () => {
 
     if (usadasError) throw usadasError;
 
-    // Encontrar ficha livre
     const idsUsadas = fichasUsadas.map(f => f.id_ficha);
     let fichaLivre = todasFichas.find(f => !idsUsadas.includes(f.id));
 
-    // Criar nova ficha se necessário
     if (!fichaLivre) {
       const { data: novaFicha, error: criarFichaError } = await supabase
         .from('Ficha')
         .insert({
-          qr_code: '', // Temporário
+          qr_code: '', 
           id_org: idOrg
         })
         .select()
@@ -123,7 +118,7 @@ const Convidado = () => {
       if (criarFichaError) throw criarFichaError;
 
       const qrCodeData = JSON.stringify({
-        fichaId: novaFicha.id,
+        fichaId: novaFicha.id, 
         orgId: idOrg,
         type: 'ficha_digital'
       });
@@ -154,8 +149,7 @@ const Convidado = () => {
     if (eventoError) throw eventoError;
 
     const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(fichaLivre.qr_code)}`;
-    
-    // Definir dados da ficha
+
     const novaFicha = {
       id: fichaLivre.id,
       nome_titular: nome,
@@ -167,7 +161,6 @@ const Convidado = () => {
     setFichaAtribuida(novaFicha);
     setQrCodeUrl(qrUrl);
 
-    // Salvar no localStorage
     const dadosParaSalvar = {
       fichaId: fichaLivre.id,
       eventoId: eventoAtivo.id,
@@ -188,7 +181,6 @@ const Convidado = () => {
 
   return (
     <div>
-      {loading && <div>Carregando...</div>}
       
       {error && (
         <div>
@@ -197,41 +189,42 @@ const Convidado = () => {
       )}
 
       {eventoAtivo && !fichaAtribuida && !loading && (
-        <div>
-          <h2>Cadastro para: {eventoAtivo.nome}</h2>
+        <div className={styles.card}>
+          <h2 className={styles.title}>CADASTRO PARA: </h2>
+          <h2 className={styles.title}>{eventoAtivo.nome}</h2>
           <form onSubmit={(e) => {
             e.preventDefault();
             const formData = new FormData(e.target);
             handleCadastro(formData.get('nome'), formData.get('contato'));
           }}>
-            <input name="nome" placeholder="Seu nome completo" required />
-            <input name="contato" placeholder="Seu telefone/email" required />
-            <button type="submit" disabled={loading}>
-              {loading ? 'Processando...' : 'Cadastrar'}
-            </button>
+            <Input name="nome" placeholder="Seu nome completo" required />
+            <Input name="contato" placeholder="Seu telefone" required />
+            <SubmitButton type="submit" text="GERAR FICHA" />
           </form>
         </div>
       )}
 
       {fichaAtribuida && eventoAtivo && (
-        <div>
-          <h2>Sua Ficha Digital</h2>
-          <p>Evento:{eventoAtivo.nome}</p>
-          <p><strong>Nome:</strong> {fichaAtribuida.nome_titular}</p>
-          <p><strong>Saldo:</strong> R$ {fichaAtribuida.saldo.toFixed(2)}</p>
-          
-          <div style={{ textAlign: 'center', margin: '2rem 0' }}>
-            <img src={qrCodeUrl} alt="Sua Ficha Digital" style={{ maxWidth: '300px' }} />
+        <div className={styles.fichaContainer}>
+          <h2 className={styles.title}>QR FICHA</h2>
+          <p className={styles.infoText}>{eventoAtivo.nome}</p>
+          <p className={styles.infoText}>Titular da ficha: {fichaAtribuida.nome_titular}</p>
+          <p className={styles.saldoText}>
+            Saldo: <span className={styles.saldoValue}>R$ {fichaAtribuida.saldo.toFixed(2)}</span>
+          </p>
+
+          <div className={styles.qrCodeWrapper}>
+            <img src={qrCodeUrl} alt="Sua Ficha Digital"/>
           </div>
 
-          <div style={{ marginTop: '1rem', textAlign: 'center' }}>
-            <p><strong>Instruções:</strong></p>
-            <ul style={{ textAlign: 'left', display: 'inline-block' }}>
+          <div className={styles.instructions}>
+            <p className={styles.instructionsTitle}>Instruções</p>
+            <ul className={styles.instructionsList}>
               <li>Apresente este QR Code para fazer recargas e compras</li>
               <li>Atualize a página para ver seu saldo atual</li>
             </ul>
           </div>
-        </div>
+      </div>  
       )}
     </div>
   );

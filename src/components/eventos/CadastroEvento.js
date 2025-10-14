@@ -59,10 +59,8 @@ function CadastroEvento() {
         <h2 className={styles.title}>Cadastrar Novo Evento</h2>
 
         <div className={styles.card}>
-          <Input text="Nome do evento" id="nomeEvento"
-            type="text"
-            value={nomeEvento}
-            onChange={(e) => setNomeEvento(e.target.value)}
+          <Input text="Nome do evento" id="nomeEvento" type="text"
+            value={nomeEvento} onChange={(e) => setNomeEvento(e.target.value)}
             required />
         </div>
 

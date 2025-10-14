@@ -3,12 +3,13 @@ import { useParams } from 'react-router-dom';
 import { supabase } from '../../../database/supabaseClient';
 import Scanner from './Scanner';
 import Recarga from './Recarga';
+import Venda from './Venda';
 
 const TeamView = () => {
   const { teamToken } = useParams();
   const [eventoValido, setEventoValido] = useState(null);
   const [fichaEscaneada, setFichaEscaneada] = useState(null);
-  const [telaAtual, setTelaAtual] = useState('menu_inicial'); // 'menu_inicial', 'scanner', 'ficha_escaneada', 'recarga'
+  const [telaAtual, setTelaAtual] = useState('menu_inicial'); // 'menu_inicial', 'scanner', 'ficha_escaneada', 'recarga', 'venda'
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -54,7 +55,6 @@ const TeamView = () => {
         return;
       }
 
-      // Buscar dados da ficha no evento atual
       const { data: fichaEventoData, error } = await supabase
         .from('fichaEvento')
         .select('*')
@@ -85,7 +85,10 @@ const TeamView = () => {
     }
   };
 
-  // Navegação
+  const handleScannerError = (errorMessage) => {
+    console.error('Erro no scanner:', errorMessage);
+  };
+
   const voltarParaMenu = () => {
     setTelaAtual('menu_inicial');
     setFichaEscaneada(null);
@@ -99,6 +102,10 @@ const TeamView = () => {
     setTelaAtual('recarga');
   };
 
+  const abrirVenda = () => {
+    setTelaAtual('venda');
+  };
+
   const fecharScanner = () => {
     setTelaAtual('menu_inicial');
   };
@@ -108,30 +115,24 @@ const TeamView = () => {
     voltarParaMenu();
   };
 
+  const handleVendaSuccess = (fichaAtualizada) => {
+    setFichaEscaneada(fichaAtualizada);
+    voltarParaMenu();
+  };
+
   const handleVoltarDeRecarga = () => {
+    setTelaAtual('ficha_escaneada');
+  };
+
+  const handleVoltarDeVenda = () => {
     setTelaAtual('ficha_escaneada');
   };
 
   if (loading && !eventoValido) {
     return (
-      <div style={{ 
-        padding: '2rem', 
-        textAlign: 'center',
-        minHeight: '50vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center'
-      }}>
+      <div>
         <div>
-          <div style={{
-            width: '50px',
-            height: '50px',
-            border: '5px solid #f3f3f3',
-            borderTop: '5px solid #4CAF50',
-            borderRadius: '50%',
-            animation: 'spin 1s linear infinite',
-            margin: '0 auto 1rem auto'
-          }}></div>
+          <div></div>
           <p>Verificando acesso...</p>
         </div>
       </div>
@@ -140,94 +141,31 @@ const TeamView = () => {
 
   if (error) {
     return (
-      <div style={{ 
-        padding: '2rem', 
-        textAlign: 'center',
-        minHeight: '50vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center'
-      }}>
-        <div style={{
-          maxWidth: '400px',
-          padding: '2rem',
-          border: '2px solid #f44336',
-          borderRadius: '8px',
-          backgroundColor: '#ffebee'
-        }}>
-          <h2 style={{ color: '#c62828', margin: '0 0 1rem 0' }}>
-            🚫 Acesso Negado
-          </h2>
-          <p style={{ margin: '0 0 1rem 0', color: '#666' }}>{error}</p>
-          <p style={{ margin: '0', fontSize: '0.9rem', color: '#999' }}>
-            Solicite um novo link à organização do evento.
-          </p>
+      <div>
+        <div>
+          <h2>Acesso Negado</h2>
+          <p>{error}</p>
+          <p>Solicite um novo link à organização do evento.</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div style={{ 
-      padding: '1rem', 
-      maxWidth: '600px', 
-      margin: '0 auto',
-      minHeight: '100vh'
-    }}>
-      {/* HEADER */}
-      <header style={{ 
-        textAlign: 'center', 
-        marginBottom: '2rem',
-        padding: '1.5rem',
-        backgroundColor: '#f8f9fa',
-        borderRadius: '12px',
-        boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
-      }}>
-        <h1 style={{ 
-          margin: '0 0 0.5rem 0', 
-          color: '#2c3e50',
-          fontSize: '1.8rem'
-        }}>
-          🎪 Sistema da Equipe
-        </h1>
-        <h2 style={{ 
-          margin: '0', 
-          color: '#7f8c8d', 
-          fontSize: '1.2rem',
-          fontWeight: 'normal'
-        }}>
-          {eventoValido.nome}
-        </h2>
+    <div>
+      <header>
+        <h1>Sistema da Equipe</h1>
+        <h2>{eventoValido.nome}</h2>
       </header>
 
-      {/* TELA: MENU INICIAL */}
       {telaAtual === 'menu_inicial' && (
-        <div style={{ textAlign: 'center' }}>
-          <button
-            onClick={abrirScanner}
-            style={{
-              padding: '1.5rem 2rem',
-              backgroundColor: '#4CAF50',
-              color: 'white',
-              border: 'none',
-              borderRadius: '12px',
-              fontSize: '1.3rem',
-              fontWeight: 'bold',
-              cursor: 'pointer',
-              width: '100%',
-              maxWidth: '300px',
-              boxShadow: '0 4px 12px rgba(76, 175, 80, 0.3)',
-              transition: 'all 0.2s'
-            }}
-            onMouseOver={(e) => e.target.style.transform = 'translateY(-2px)'}
-            onMouseOut={(e) => e.target.style.transform = 'translateY(0)'}
-          >
-            📱 Escanear Ficha
+        <div>
+          <button onClick={abrirScanner}>
+            Escanear Ficha
           </button>
         </div>
       )}
 
-      {/* TELA: SCANNER */}
       {telaAtual === 'scanner' && (
         <Scanner 
           onQRCodeRead={handleQRCodeRead}
@@ -235,98 +173,32 @@ const TeamView = () => {
         />
       )}
 
-      {/* TELA: FICHA ESCANEADA */}
       {telaAtual === 'ficha_escaneada' && fichaEscaneada && (
         <div>
-          <div style={{ 
-            backgroundColor: '#e8f5e8', 
-            padding: '1.5rem', 
-            borderRadius: '12px', 
-            marginBottom: '2rem',
-            border: '2px solid #4CAF50',
-            boxShadow: '0 2px 8px rgba(76, 175, 80, 0.2)'
-          }}>
-            <h3 style={{ 
-              color: '#2e7d32', 
-              margin: '0 0 1rem 0',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.5rem'
-            }}>
-              ✅ Ficha Identificada
-            </h3>
-            <div style={{ fontSize: '1.1rem' }}>
-              <p style={{ margin: '0.5rem 0' }}>
-                <strong>Cliente:</strong> {fichaEscaneada.nome_titular}
-              </p>
-              <p style={{ margin: '0.5rem 0' }}>
-                <strong>Contato:</strong> {fichaEscaneada.contato}
-              </p>
-              <p style={{ margin: '0.5rem 0' }}>
-                <strong>Saldo:</strong> 
-                <span style={{ 
-                  color: fichaEscaneada.saldo > 0 ? '#2e7d32' : '#d32f2f',
-                  fontWeight: 'bold',
-                  fontSize: '1.2rem'
-                }}>
-                  {' '}R$ {fichaEscaneada.saldo.toFixed(2)}
-                </span>
-              </p>
+          <div>
+            <h3>Ficha Identificada</h3>
+            <div>
+              <p><strong>Cliente:</strong> {fichaEscaneada.nome_titular}</p>
+              <p><strong>Contato:</strong> {fichaEscaneada.contato}</p>
+              <p><strong>Saldo:</strong> R$ {fichaEscaneada.saldo.toFixed(2)}</p>
             </div>
           </div>
 
-          <div style={{ marginBottom: '1.5rem' }}>
-            <button
-              onClick={abrirRecarga}
-              style={{
-                width: '100%',
-                padding: '1.2rem',
-                backgroundColor: '#4CAF50',
-                color: 'white',
-                border: 'none',
-                borderRadius: '8px',
-                fontSize: '1.1rem',
-                fontWeight: 'bold',
-                cursor: 'pointer',
-                boxShadow: '0 2px 8px rgba(76, 175, 80, 0.3)',
-                transition: 'all 0.2s'
-              }}
-              onMouseOver={(e) => {
-                e.target.style.backgroundColor = '#45a049';
-                e.target.style.transform = 'translateY(-2px)';
-              }}
-              onMouseOut={(e) => {
-                e.target.style.backgroundColor = '#4CAF50';
-                e.target.style.transform = 'translateY(0)';
-              }}
-            >
-              💰 Fazer Recarga
+          <div>
+            <button onClick={abrirRecarga}>
+              Fazer Recarga
+            </button>
+            <button onClick={abrirVenda}>
+              Processar Venda
             </button>
           </div>
 
-          <button
-            onClick={voltarParaMenu}
-            style={{
-              width: '100%',
-              padding: '1rem',
-              backgroundColor: '#6c757d',
-              color: 'white',
-              border: 'none',
-              borderRadius: '8px',
-              fontSize: '1rem',
-              fontWeight: 'bold',
-              cursor: 'pointer',
-              transition: 'all 0.2s'
-            }}
-            onMouseOver={(e) => e.target.style.backgroundColor = '#5a6268'}
-            onMouseOut={(e) => e.target.style.backgroundColor = '#6c757d'}
-          >
-            🔙 Voltar ao Menu
+          <button onClick={voltarParaMenu}>
+            Voltar ao Menu
           </button>
         </div>
       )}
 
-      {/* TELA: RECARGA */}
       {telaAtual === 'recarga' && fichaEscaneada && (
         <Recarga 
           fichaEscaneada={fichaEscaneada}
@@ -335,39 +207,20 @@ const TeamView = () => {
         />
       )}
 
-      {/* LOADING OVERLAY */}
+      {telaAtual === 'venda' && fichaEscaneada && (
+        <Venda 
+          fichaEscaneada={fichaEscaneada}
+          eventoId={eventoValido.id}
+          onVendaSuccess={handleVendaSuccess}
+          onVoltar={handleVoltarDeVenda}
+        />
+      )}
+
       {loading && telaAtual !== 'menu_inicial' && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: 'rgba(0,0,0,0.6)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 1000
-        }}>
-          <div style={{
-            backgroundColor: 'white',
-            padding: '2rem',
-            borderRadius: '12px',
-            textAlign: 'center',
-            boxShadow: '0 8px 32px rgba(0,0,0,0.3)'
-          }}>
-            <div style={{
-              width: '50px',
-              height: '50px',
-              border: '5px solid #f3f3f3',
-              borderTop: '5px solid #4CAF50',
-              borderRadius: '50%',
-              animation: 'spin 1s linear infinite',
-              margin: '0 auto 1rem auto'
-            }}></div>
-            <p style={{ margin: '0', fontSize: '1.2rem', color: '#333' }}>
-              Processando...
-            </p>
+        <div>
+          <div>
+            <div></div>
+            <p>Processando...</p>
           </div>
         </div>
       )}

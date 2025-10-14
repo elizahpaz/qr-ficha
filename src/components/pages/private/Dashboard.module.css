@@ -21,9 +21,15 @@
     background-color: var(--primary-color);
     padding: 20px;
     color: var(--bg-cor);
-    border-radius: 50%;
+    border-radius: 70%;
     font-size: 50px;
     position: fixed;
     bottom: 20px;
     right: 20px;
+}
+
+.eventList {
+    padding: 10px;
+    margin: auto;
+    max-width: 900px;
 }

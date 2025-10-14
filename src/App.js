@@ -1,6 +1,5 @@
 import { Route, Routes } from 'react-router-dom';
 
-
 import Dashboard from './components/pages/private/Dashboard';
 import LandingPage from "./components/pages/public/LandingPage";
 import Login from './components/pages/public/Login';

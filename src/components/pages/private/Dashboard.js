@@ -46,7 +46,20 @@ const Dashboard = () => {
     fetchData();
   }, []);
 
-  const handleUpdateStatus = async (idEvento, newStatus) => {
+  // No Dashboard.jsx - Função handleUpdateStatus ATUALIZADA
+
+const handleUpdateStatus = async (idEvento, newStatus) => {
+  if (!newStatus) {
+    const confirmar = window.confirm(
+      'Ao finalizar o evento:\n' +
+      '✅ Dados do relatório serão MANTIDOS (itemCompra e Recarga)\n' +
+      '❌ Fichas serão RESETADAS (fichaEvento)\n\n' +
+      'Deseja continuar?'
+    );
+    
+    if (!confirmar) return;
+  }
+
   setLoading(true);
   
   try {
@@ -54,10 +67,9 @@ const Dashboard = () => {
     const idOrg = session.user.id;
 
     if (newStatus) {
-      // Gerar token único para este evento
+      
       const teamToken = crypto.randomUUID();
 
-      // Desativar outros eventos
       await supabase
         .from('Evento')
         .update({ status: false, team_token: null })
@@ -66,7 +78,7 @@ const Dashboard = () => {
       const { error } = await supabase
         .from('Evento')
         .update({ 
-          status: newStatus,
+          status: true,
           team_token: teamToken
         })
         .eq('id', idEvento);
@@ -75,58 +87,61 @@ const Dashboard = () => {
 
       setEventos(prevEventos =>
         prevEventos.map(evento => {
-          if (newStatus && evento.id !== idEvento) {
+          if (evento.id !== idEvento) {
             return { ...evento, status: false, team_token: null };
-          } else if (evento.id === idEvento) {
-            return { ...evento, status: newStatus, team_token: teamToken };
+          } else {
+            return { ...evento, status: true, team_token: teamToken };
           }
-          return evento;
         })
       );
+
+      console.log(`Evento ${idEvento} iniciado com sucesso`);
+      
     } else {
-      const { error } = await supabase
+      
+      console.log('Finalizando evento e mantendo dados do relatório...');
+      
+      const { error: deleteFichaEventoError } = await supabase
+        .from('fichaEvento')
+        .delete()
+        .eq('id_evento', idEvento);
+
+      if (deleteFichaEventoError) {
+        console.error('Erro ao deletar fichaEvento:', deleteFichaEventoError);
+        throw deleteFichaEventoError;
+      }
+
+      console.log('fichaEvento deletadas - fichas resetadas');
+
+      // Desativar o evento
+      const { error: updateError } = await supabase
         .from('Evento')
-        .update({ status: false, team_token: null })
+        .update({ 
+          status: false,
+          team_token: null
+        })
         .eq('id', idEvento);
 
-      if (error) throw error;
+      if (updateError) {
+        console.error('Erro ao desativar evento:', updateError);
+        throw updateError;
+      }
 
       setEventos(prevEventos =>
         prevEventos.map(evento => 
           evento.id === idEvento ? { ...evento, status: false, team_token: null } : evento
         )
       );
+
+      console.log(`Evento ${idEvento} finalizado com sucesso`);
+      alert('Evento finalizado com sucesso!\n✅ Fichas resetadas\n✅ Dados do relatório mantidos (Recarga, Compra, itemCompra)');
     }
+
   } catch (error) {
     console.error('Erro ao atualizar status:', error);
-    alert('Erro ao atualizar evento');
+    alert('Erro ao atualizar evento: ' + error.message);
   } finally {
     setLoading(false);
-  }
-};
-
-  const finalizarEvento = async (eventoId) => {
-  try {
-    // Finalizar evento
-    const { error: eventoError } = await supabase
-      .from('Evento')
-      .update({ status: false })
-      .eq('id', eventoId);
-
-    if (eventoError) throw eventoError;
-
-    // Limpar dados temporários das fichas deste evento
-    const { error: limparError } = await supabase
-      .from('fichaEvento')
-      .delete()
-      .eq('id_evento', eventoId);
-
-    if (limparError) throw limparError;
-
-    console.log('Evento finalizado e fichas liberadas para reutilização');
-
-  } catch (error) {
-    console.error('Erro ao finalizar evento:', error);
   }
 };
 
@@ -136,16 +151,19 @@ const Dashboard = () => {
         <Link to="/perfil" className={styles.userName}>{userName}</Link>
       </header>
 
-      <BtnAddEvento />
-  
-      {eventos.map(evento => (
-        <Event 
-          key={evento.id} 
-          evento={evento} 
-          onUpdateStatus={handleUpdateStatus}
-        />
-      ))}
+      <div className={styles.eventList}>
+        <BtnAddEvento />
 
+          {eventos.map(evento => (
+          <Event 
+            key={evento.id} 
+            evento={evento} 
+            onUpdateStatus={handleUpdateStatus}
+          />
+        ))}
+      </div>
+
+      
       <Link to="/ficha-evento" className={styles.qrCode}><IoQrCodeSharp /></Link>
     </div>
   );

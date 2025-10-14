@@ -10,7 +10,6 @@ const EventCode = () => {
   useEffect(() => {
     async function generateQRCode() {
       try {
-        // Pegar o ID da organização logada
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
         if (sessionError || !session) {
           console.error('Erro na sessão:', sessionError);
@@ -20,10 +19,8 @@ const EventCode = () => {
         const idOrg = session.user.id;
         setOrganizationId(idOrg);
 
-        // URL que sempre levará para o cadastro do convidado
         const guestRegistrationUrl = `${window.location.origin}/convidado/${idOrg}`;
         
-        // API QR-Server gera o QR Code para a Organização
         const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(guestRegistrationUrl)}`;
         
         setQrCodeUrl(qrApiUrl);
@@ -49,7 +46,7 @@ const EventCode = () => {
   return (
     <div className={styles.container}>
       <div className={styles.qrSection}>
-        <h2>QR Code de Cadastro</h2>
+        <h2>QR CODE DE CADASTRO</h2>
         <div className={styles.qrContainer}>
           <img 
             src={qrCodeUrl} 
@@ -62,19 +59,20 @@ const EventCode = () => {
       <div className={styles.instructions}>
         <h3>Como funciona</h3>
         <div className={styles.instructionsList}>
-          <p>1.Compartilhe este QR Code com os convidados do seu evento</p>
-          <p>2.Convidados escaneiam o código e fazem seu cadastro</p>
-          <p>3.Sistema gera uma ficha digital única para cada convidado</p>
-          <p>4.Ficha é válida apenas durante eventos ativos</p>
+          <ol>
+            <li>Seus convidados escaneiam o código e fazem seu cadastro</li>
+            <li>O sistema gera uma ficha digital para cada convidado</li>
+            <li>A ficha é válida somente enquanto o evento estiver ativo</li>
+          </ol>
         </div>
         
         <div className={styles.alert}>
-          <h4>⚠️ ATENÇÃO:</h4>
+          <h4>ATENÇÃO:</h4>
           <ul>
             <li>Este QR Code só funciona se houver um evento ativo</li>
-            <li>O mesmo QR Code pode ser reutilizado para TODOS os eventos</li>
+            <li>Este QR Code pode ser reutilizado para TODOS os eventos</li>
             <li>Cada convidado receberá uma ficha digital única</li>
-            <li>As fichas são automaticamente limpas ao finalizar um evento</li>
+            <li>Os dados das fichas são apagados quando o evento é finalizado</li>
           </ul>
         </div>
       </div>

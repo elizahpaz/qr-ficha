@@ -6,15 +6,13 @@ function CardItem({ id, onUpdate, onRemove, initialData }) {
   const [nome, setNome] = useState(initialData?.nome_item || initialData?.nome || '');
   const [preco, setPreco] = useState(initialData?.preco || initialData?.valor || '');
 
-  // Atualiza apenas quando initialData muda (não na primeira renderização)
   useEffect(() => {
     if (initialData) {
       setNome(initialData.nome_item || initialData.nome || '');
       setPreco(initialData.preco || initialData.valor || '');
     }
-  }, [initialData?.id]); // Só dispara se o ID do item mudar
+  }, [initialData?.id]); 
 
-  // Chama onUpdate quando os campos mudam, mas sem interferir na digitação
   useEffect(() => {
     if (onUpdate) {
       onUpdate({ 
@@ -23,7 +21,7 @@ function CardItem({ id, onUpdate, onRemove, initialData }) {
         preco: preco 
       });
     }
-  }, [nome, preco]); // Removido onUpdate e id das dependências
+  }, [nome, preco]);
 
   const handleDelete = () => {
     onRemove(id);
@@ -41,32 +39,16 @@ function CardItem({ id, onUpdate, onRemove, initialData }) {
     <div className={styles.container}>
       <form className={styles.cardForm} onSubmit={(e) => e.preventDefault()}>
         <div className={styles.inputNome}>
-          <Input 
-            type="text" 
-            id={`nome-${id}`}
-            text="Nome do Item" 
-            value={nome} 
-            onChange={handleNomeChange}
-            required
-          />
+          <Input type="text" id={`nome-${id}`} text="Nome do Item" 
+            value={nome} onChange={handleNomeChange} required/>
         </div>
 
         <div className={styles.inputRow}>
-          <Input 
-            type="number" 
-            id={`preco-${id}`}
-            text="Valor" 
-            value={preco} 
-            onChange={handlePrecoChange}
-            step="0.01"
-            min="0"
-            required
-          />
-          <button 
-            type="button" 
-            onClick={handleDelete} 
-            className={styles.deleteButton}
-          >
+          <Input type="number" id={`preco-${id}`} text="Valor" 
+            value={preco} onChange={handlePrecoChange}
+            step="0.01" min="0" required/>
+          <button  type="button" 
+            onClick={handleDelete} className={styles.deleteButton}>
             Excluir
           </button>
         </div>

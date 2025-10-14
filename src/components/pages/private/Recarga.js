@@ -25,7 +25,7 @@ const Recarga = ({ fichaEscaneada, onRecargaSuccess, onVoltar }) => {
 
       const novoSaldo = fichaEscaneada.saldo + valorRecarga;
 
-      // Atualizar saldo na fichaEvento
+      // 1. Atualizar saldo na fichaEvento
       const { error: updateError } = await supabase
         .from('fichaEvento')
         .update({ saldo: novoSaldo })
@@ -36,18 +36,24 @@ const Recarga = ({ fichaEscaneada, onRecargaSuccess, onVoltar }) => {
         throw updateError;
       }
 
-      // Registrar recarga na tabela Recarga
-      const { error: recargaError } = await supabase
+      // 2. Registrar recarga na tabela Recarga
+      const { data: recargaData, error: recargaError } = await supabase
         .from('Recarga')
         .insert({
           id_fichaEvento: fichaEscaneada.id,
-          valor: valorRecarga,
-        });
+          valor: valorRecarga
+        })
+        .select(); // Adicionar .select() para ver o que foi inserido
 
       if (recargaError) {
         console.error('Erro ao registrar recarga:', recargaError);
+        console.error('Detalhes:', recargaError.message, recargaError.details, recargaError.hint);
         alert('Saldo atualizado, mas erro ao registrar no histórico');
+      } else {
+        console.log('Recarga registrada com sucesso:', recargaData);
       }
+
+      alert(`Recarga de R$ ${valorRecarga.toFixed(2)} processada com sucesso!\nNovo saldo: R$ ${novoSaldo.toFixed(2)}`);
       
       onRecargaSuccess({
         ...fichaEscaneada,
@@ -68,7 +74,7 @@ const Recarga = ({ fichaEscaneada, onRecargaSuccess, onVoltar }) => {
     <div>
       <div>
         <h3>💰 Processar Recarga</h3>
-        <p>Convidado:{fichaEscaneada.nome_titular}</p>
+        <p><strong>Cliente:</strong> {fichaEscaneada.nome_titular}</p>
         <p><strong>Saldo atual:</strong> R$ {fichaEscaneada.saldo.toFixed(2)}</p>
       </div>
 
@@ -91,7 +97,7 @@ const Recarga = ({ fichaEscaneada, onRecargaSuccess, onVoltar }) => {
 
         {valor && parseFloat(valor) > 0 && (
           <div>
-            Novo saldo: R$ {(fichaEscaneada.saldo + parseFloat(valor)).toFixed(2)}
+            <strong>Novo saldo será:</strong> R$ {(fichaEscaneada.saldo + parseFloat(valor)).toFixed(2)}
           </div>
         )}
 

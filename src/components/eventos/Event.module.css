@@ -31,11 +31,6 @@
   border: none;
   border-radius: 8px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.container button:hover {
-  background-color: #0056b3;
 }
 
 .container button:disabled {
@@ -47,16 +42,16 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 100%;
+  width: 90%;
   padding: 0.5rem;
   color: var(--text-color);
   text-decoration: none;
   font-size: 1rem;
-  transition: color 0.3s ease;
+  border: 2px solid #555;
+  border-radius: 8px;
 }
 
 .urlText {
-  /* Estilo para a URL quando o evento está iniciado */
   font-size: 0.9rem;
   color: #555;
   text-align: center;
@@ -68,9 +63,6 @@
   text-decoration: underline;
 }
 
-/*
-  MEDIA QUERY PARA TELAS MAIORES
-*/
 
 @media (min-width: 768px) {
   .container {
@@ -83,17 +75,17 @@
 
   .container h3 {
     text-align: left;
-    flex-grow: 1; /* Permite que o título ocupe o espaço restante */
+    flex-grow: 1; 
     min-width: 200px;
   }
   
   .container button,
   .button {
     width: auto;
-    flex-shrink: 0; /* Impede que os botões diminuam */
+    flex-shrink: 0; 
   }
 
   .button {
-    min-width: 80px; /* Garante um tamanho mínimo para o ícone */
+    min-width: 80px;
   }
 }

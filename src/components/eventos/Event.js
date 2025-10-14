@@ -8,7 +8,6 @@ const Event = ({ evento, onUpdateStatus }) => {
 
   const handleButtonClick = () => {
     if (evento.status) {
-      // Se está ativo, finalizar
       onUpdateStatus(evento.id, false);
     } else {
       onUpdateStatus(evento.id, true);
@@ -25,14 +24,12 @@ const Event = ({ evento, onUpdateStatus }) => {
         </button>
 
         {evento.status ? (
-          // Se o status for TRUE (iniciado), exibe opções de compartilhamento
           <div className={styles.shareSection}>
             <span className={styles.urlText}>
               Link: <a href={eventUrl} target="_blank" rel="noopener noreferrer">{eventUrl}</a>
             </span>
           </div>
         ) : (
-          // Se o status for FALSE (não iniciado), exibe o Link de Editar
           <Link to={`/add-itens/${evento.id}`} className={styles.button}>
             Editar
           </Link>

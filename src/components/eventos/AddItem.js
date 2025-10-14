@@ -64,13 +64,11 @@ function AddItem() {
 
   const handleRemoveItem = async (itemId) => {
     try {
-      // Tenta deletar do banco (se existir)
       await supabase
         .from('Item')
         .delete()
         .eq('id', itemId);
 
-      // Remove da lista local
       setItems(prev => prev.filter(item => item.id !== itemId));
     } catch (err) {
       setError('Erro ao remover item: ' + err.message);
@@ -88,7 +86,6 @@ function AddItem() {
     setError('');
 
     try {
-      // Salva todos os itens
       await supabase
         .from('Item')
         .delete()
@@ -115,7 +112,7 @@ function AddItem() {
   };
 
   const handleExcluirEvento = async () => {
-    if (!window.confirm(`Tem certeza que deseja excluir o evento "${eventName}" e todos os seus itens? Esta ação não pode ser desfeita.`)) {
+    if (!window.confirm(`Tem certeza que deseja excluir o evento "${eventName}" e os itens? Esta ação não pode ser desfeita.`)) {
       return;
     }
 
@@ -153,12 +150,8 @@ function AddItem() {
       
       {items.map((item) => (
         <CardItem
-          key={item.id}
-          id={item.id}
-          initialData={item}
-          onUpdate={handleUpdateItem}
-          onRemove={handleRemoveItem}
-        />
+          key={item.id} id={item.id} initialData={item}
+          onUpdate={handleUpdateItem} onRemove={handleRemoveItem}/>
       ))}
 
       <button className={styles.addItem} onClick={handleAddItem} disabled={loading}>
@@ -173,6 +166,7 @@ function AddItem() {
         <SubmitButton text={loading ? "Salvando..." : "SALVAR"} type="submit" 
           onClick={handleFinalizar} disabled={loading || items.length === 0} />
       </div>
+      
     </div>
   );
 }

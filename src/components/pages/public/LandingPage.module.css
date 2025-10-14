@@ -92,3 +92,15 @@
     font-size: 1.1rem;
   }
 }
+
+/*FOOTER*/
+.containerFooter{
+    background-color: var(--primary-color);
+    padding: 20px;
+}
+
+.copy {
+    color: var(--bg-cor);
+    text-align: center;
+    font-weight: 500;
+}

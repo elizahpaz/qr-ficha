@@ -76,7 +76,7 @@ const Scanner = ({ onQRCodeRead, onClose }) => {
                     });
                     
                     scannerInstanceRef.current = scanner;
-                    scanner.render(success, handleError);
+                    scanner.render(success);
                 }
             }, 100);
 
