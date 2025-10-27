@@ -25,7 +25,7 @@
     justify-content: space-between;
 }
 
-button {
+.button {
     background-color: #dc3545;
     color: white;
     border: none;

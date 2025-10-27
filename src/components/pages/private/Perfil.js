@@ -144,7 +144,7 @@ const Perfil = () => {
 
         <div className={styles.btnSection}>
           <SubmitButton text={"Salvar"} type submit/>
-          <button>Deletar conta</button>
+          <button className={styles.button}>Deletar conta</button>
         </div>
 
       </form>

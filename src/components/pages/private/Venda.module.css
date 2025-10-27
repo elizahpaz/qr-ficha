@@ -1,0 +1,145 @@
+/* Container principal - Substitui o style={{ padding: '20px', maxWidth: '1200px', margin: '0 auto' }} */
+.vendaContainer {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Informações do Cliente - Substitui o bloco de estilo do topo */
+.clienteInfoBox {
+  margin-bottom: 30px;
+  padding: 20px;
+  background-color: #f8fafc; /* Fundo claro */
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.infoTitle {
+  margin-bottom: 10px;
+  color: #1e293b; /* Cor de texto escuro */
+}
+
+/* Grid de Itens - Substitui o estilo do display: 'grid' */
+.itensGrid {
+  display: grid;
+  /* Cria colunas responsivas, mín de 280px */
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+/* Card de Item Individual */
+.itemCard {
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 20px;
+  background-color: white;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.itemHeader {
+  margin-bottom: 15px;
+}
+
+.itemName {
+  margin: 0 0 8px 0;
+  font-size: 18px;
+  color: #1e293b;
+}
+
+.itemDescription {
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  color: #64748b;
+}
+
+.itemPrice {
+  margin: 0;
+  font-size: 20px;
+  font-weight: bold;
+  color: #3b82f6; /* Azul de destaque */
+}
+
+.itemControls {
+  /* Espaçamento dentro dos controles */
+}
+
+.itemLabel {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 14px;
+  color: #333;
+}
+
+.itemSubtotal {
+  font-weight: bold;
+  margin-top: 10px;
+  color: #28a745; /* Verde para subtotal */
+}
+
+/* Footer Sticky (Barra de Ação) - Substitui o estilo do 'position: sticky' */
+.footerSticky {
+  position: sticky;
+  bottom: 0;
+  background-color: white;
+  padding: 20px;
+  border-top: 2px solid #e2e8f0;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+  z-index: 10; /* Garante que fique acima do conteúdo */
+}
+
+.totalInfo {
+  margin-bottom: 20px;
+}
+
+.totalRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.totalLabel {
+  margin: 0;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.totalValue {
+  margin: 0;
+  font-size: 24px;
+  font-weight: bold;
+  color: #3b82f6; /* Azul de destaque */
+}
+
+.saldoAposCompra {
+  margin: 0;
+  font-size: 14px;
+  color: #64748b;
+}
+
+.footerActions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+/* Botão Voltar (Estilo específico) */
+.voltarButton {
+  padding: 12px 24px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  background-color: white;
+  cursor: pointer;
+  font-size: 16px;
+  transition: opacity 0.2s, background-color 0.2s;
+}
+
+.voltarButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.voltarButton:not(:disabled):hover {
+    background-color: #f1f5f9;
+}

@@ -1,5 +1,8 @@
 import { useState } from 'react';
 import { supabase } from '../../../database/supabaseClient';
+import SubmitButton from '../../form/SubmitButton';
+import Input from '../../form/Input';
+import styles from './Recarga.module.css';
 
 const Recarga = ({ fichaEscaneada, onRecargaSuccess, onVoltar }) => {
   const [valor, setValor] = useState('');
@@ -25,7 +28,7 @@ const Recarga = ({ fichaEscaneada, onRecargaSuccess, onVoltar }) => {
 
       const novoSaldo = fichaEscaneada.saldo + valorRecarga;
 
-      // 1. Atualizar saldo na fichaEvento
+      //Atualizar saldo na tabela fichaEvento
       const { error: updateError } = await supabase
         .from('fichaEvento')
         .update({ saldo: novoSaldo })
@@ -36,14 +39,15 @@ const Recarga = ({ fichaEscaneada, onRecargaSuccess, onVoltar }) => {
         throw updateError;
       }
 
-      // 2. Registrar recarga na tabela Recarga
+      // Registrar recarga na tabela Recarga
       const { data: recargaData, error: recargaError } = await supabase
         .from('Recarga')
         .insert({
-          id_fichaEvento: fichaEscaneada.id,
+          id_ficha: fichaEscaneada.id,
+          id_evento: fichaEscaneada.id_evento,
           valor: valorRecarga
         })
-        .select(); // Adicionar .select() para ver o que foi inserido
+        .select();
 
       if (recargaError) {
         console.error('Erro ao registrar recarga:', recargaError);
@@ -71,62 +75,37 @@ const Recarga = ({ fichaEscaneada, onRecargaSuccess, onVoltar }) => {
   };
 
   return (
-    <div>
-      <div>
-        <h3>💰 Processar Recarga</h3>
-        <p><strong>Cliente:</strong> {fichaEscaneada.nome_titular}</p>
-        <p><strong>Saldo atual:</strong> R$ {fichaEscaneada.saldo.toFixed(2)}</p>
+    <div className={styles.recargaContainer}>
+      <div className={styles.infoBox}>
+        <h3 className={styles.title}>FAZER RECARGA</h3>
+        <p className={styles.infoText}>Titular: <span>{fichaEscaneada.nome_titular}</span></p>
+        <p className={styles.saldoAtual}>Saldo atual: <span className={styles.saldoValue}>R$ {fichaEscaneada.saldo.toFixed(2)}</span></p>
       </div>
 
-      <form onSubmit={handleRecarga}>
-        <div>
-          <label htmlFor="valorRecarga">Valor da Recarga:</label>
-          <input
-            id="valorRecarga"
-            type="number"
-            step="0.01"
-            min="0.01"
-            placeholder="Ex: 25.00"
+      <form onSubmit={handleRecarga} className={styles.recargaForm}>
+        <div className={styles.inputWrapper}>
+          <Input id="valorRecarga" type="number" text="Valor da recarga"
+            step="0.01" min="0.01" placeholder="Ex: 25.50"
             value={valor}
             onChange={(e) => setValor(e.target.value)}
-            disabled={loading}
-            required
-            autoFocus
-          />
+            disabled={loading} required autoFocus />
         </div>
 
-        {valor && parseFloat(valor) > 0 && (
-          <div>
-            <strong>Novo saldo será:</strong> R$ {(fichaEscaneada.saldo + parseFloat(valor)).toFixed(2)}
-          </div>
-        )}
+          {valor && parseFloat(valor) > 0 && (
+            <div className={styles.novoSaldoBox}>
+              Novo saldo: <span className={styles.novoSaldoValue}>R$ {(fichaEscaneada.saldo + parseFloat(valor)).toFixed(2)}</span>
+            </div>
+          )}
 
-        <div>
-          <button type="submit" disabled={loading || !valor || parseFloat(valor) <= 0}>
-            {loading ? 'Processando...' : 'Confirmar Recarga'}
-          </button>
+          <div className={styles.actionButtons}>
+            <SubmitButton type="submit" text="CONFIRMAR RECARGA" 
+              disabled={loading || !valor || parseFloat(valor) <= 0} />
 
-          <button type="button" onClick={onVoltar} disabled={loading}>
-            Voltar
-          </button>
-        </div>
-      </form>
-
-      <div>
-        <p>Valores rápidos:</p>
-        <div>
-          {[10, 20, 50, 100].map(valorSugerido => (
-            <button
-              key={valorSugerido}
-              type="button"
-              onClick={() => setValor(valorSugerido.toString())}
-              disabled={loading}
-            >
-              R$ {valorSugerido}
+            <button type="button" onClick={onVoltar} disabled={loading} className={styles.backButton}>
+              Voltar
             </button>
-          ))}
-        </div>
-      </div>
+          </div>
+        </form>
     </div>
   );
 };
