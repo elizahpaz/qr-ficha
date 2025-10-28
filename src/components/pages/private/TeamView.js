@@ -115,10 +115,6 @@ const TeamView = () => {
     setIdFichaManual('');
   };
 
-  const handleScannerError = (errorMessage) => {
-    console.error('Erro no scanner:', errorMessage);
-  };
-
   const voltarParaMenu = () => {
     setTelaAtual('menu_inicial');
     setFichaEscaneada(null);

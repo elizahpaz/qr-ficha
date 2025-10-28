@@ -13,6 +13,7 @@ import Recarga from './components/pages/private/Recarga';
 import Venda from './components/pages/private/Venda';
 import Convidado from './components/pages/private/Convidado';
 import TeamView from './components/pages/private/TeamView';
+import Relatorio from './components/pages/private/Relatorio';
 
 function App() {
   return (
@@ -31,6 +32,7 @@ function App() {
         <Route path="/ficha-evento" element={<EventCode />} />
         <Route path="/recarga" element={<Recarga />} />
         <Route path="/venda" element={<Venda />} />
+        <Route path="/relatorio/:idEvento" element={<Relatorio />} />
       </Route>
 
       <Route path="*" element={<h1>404 - Página não encontrada</h1>} />

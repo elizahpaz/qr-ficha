@@ -207,12 +207,15 @@ const Convidado = () => {
       {fichaAtribuida && eventoAtivo && (
         <div className={styles.fichaContainer}>
           <h2 className={styles.title}>QR FICHA</h2>
-          <p className={styles.infoText}>{eventoAtivo.nome}</p>
-          <p className={styles.infoText}>Titular da ficha: {fichaAtribuida.nome_titular}</p>
+          
+          <p className={styles.title}>{eventoAtivo.nome}</p>
+          
+          <p className={styles.infoText}>Nome do titular: {fichaAtribuida.nome_titular}</p>
           <p className={styles.saldoText}>
             Saldo: <span className={styles.saldoValue}>R$ {fichaAtribuida.saldo.toFixed(2)}</span>
           </p>
 
+          <h3>ID: {fichaAtribuida.id}</h3>
           <div className={styles.qrCodeWrapper}>
             <img src={qrCodeUrl} alt="Sua Ficha Digital"/>
           </div>

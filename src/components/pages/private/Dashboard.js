@@ -46,14 +46,13 @@ const Dashboard = () => {
     fetchData();
   }, []);
 
-  // No Dashboard.jsx - Função handleUpdateStatus ATUALIZADA
-
 const handleUpdateStatus = async (idEvento, newStatus) => {
-  if (!newStatus) {
+
+  // --- LÓGICA DE FINALIZAÇÃO ---
+  if (newStatus === 'FINALIZADO') {
     const confirmar = window.confirm(
       'Ao finalizar o evento:\n' +
-      '✅ Dados do relatório serão MANTIDOS (itemCompra e Recarga)\n' +
-      '❌ Fichas serão RESETADAS (fichaEvento)\n\n' +
+      'As fichas serão RESETADAS (deletadas) para serem usadas no próximo evento.\n\n' +
       'Deseja continuar?'
     );
     
@@ -66,40 +65,51 @@ const handleUpdateStatus = async (idEvento, newStatus) => {
     const { data: { session } } = await supabase.auth.getSession();
     const idOrg = session.user.id;
 
-    if (newStatus) {
+    if (newStatus === 'INICIADO') {
       
-      const teamToken = crypto.randomUUID();
-
-      await supabase
+      const { data: activeEvent, error: checkError } = await supabase
         .from('Evento')
-        .update({ status: false, team_token: null })
-        .eq('id_org', idOrg);
+        .select('id, nome')
+        .eq('id_org', idOrg)
+        .eq('status', 'INICIADO')
+        .maybeSingle(); // Tenta buscar um (e apenas um) evento ativo
+
+      if (checkError) {
+        console.error('Erro ao verificar eventos ativos:', checkError);
+        throw checkError;
+      }
+
+      if (activeEvent) {
+        // Se encontrou um evento ativo, bloqueia a ação
+        alert(`Erro: O evento "${activeEvent.nome}" (ID: ${activeEvent.id}) já está INICIADO. Você deve finalizá-lo antes de iniciar um novo.`);
+        throw new Error('Já existe um evento ativo.');
+      }
+
+      const teamToken = crypto.randomUUID();
 
       const { error } = await supabase
         .from('Evento')
         .update({ 
-          status: true,
+          status: 'INICIADO',
           team_token: teamToken
         })
         .eq('id', idEvento);
 
       if (error) throw error;
-
       setEventos(prevEventos =>
         prevEventos.map(evento => {
           if (evento.id !== idEvento) {
-            return { ...evento, status: false, team_token: null };
+            if (evento.status === 'FINALIZADO') {
+                return evento;
+            }
+            return { ...evento, status: 'CRIADO', team_token: null };
           } else {
-            return { ...evento, status: true, team_token: teamToken };
+            return { ...evento, status: 'INICIADO', team_token: teamToken };
           }
         })
       );
-
-      console.log(`Evento ${idEvento} iniciado com sucesso`);
       
-    } else {
-      
-      console.log('Finalizando evento e mantendo dados do relatório...');
+    } else if (newStatus === 'FINALIZADO') {
       
       const { error: deleteFichaEventoError } = await supabase
         .from('fichaEvento')
@@ -107,17 +117,16 @@ const handleUpdateStatus = async (idEvento, newStatus) => {
         .eq('id_evento', idEvento);
 
       if (deleteFichaEventoError) {
-        console.error('Erro ao deletar fichaEvento:', deleteFichaEventoError);
+        console.error('Erro ao deletar ficha_evento:', deleteFichaEventoError);
         throw deleteFichaEventoError;
       }
 
-      console.log('fichaEvento deletadas - fichas resetadas');
+      console.log('Fichas do evento resetadas (ficha_evento deletadas)');
 
-      // Desativar o evento
       const { error: updateError } = await supabase
         .from('Evento')
         .update({ 
-          status: false,
+          status: 'FINALIZADO',
           team_token: null
         })
         .eq('id', idEvento);
@@ -129,12 +138,12 @@ const handleUpdateStatus = async (idEvento, newStatus) => {
 
       setEventos(prevEventos =>
         prevEventos.map(evento => 
-          evento.id === idEvento ? { ...evento, status: false, team_token: null } : evento
+          evento.id === idEvento ? { ...evento, status: 'FINALIZADO', team_token: null } : evento
         )
       );
 
       console.log(`Evento ${idEvento} finalizado com sucesso`);
-      alert('Evento finalizado com sucesso!\n✅ Fichas resetadas\n✅ Dados do relatório mantidos (Recarga, Compra, itemCompra)');
+      alert('Evento finalizado com sucesso!\n✅ Fichas resetadas\n✅ Dados do relatório mantidos (Recarga, Compra)');
     }
 
   } catch (error) {
@@ -163,7 +172,6 @@ const handleUpdateStatus = async (idEvento, newStatus) => {
         ))}
       </div>
 
-      
       <Link to="/ficha-evento" className={styles.qrCode}><IoQrCodeSharp /></Link>
     </div>
   );

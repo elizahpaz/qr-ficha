@@ -43,7 +43,7 @@ const Recarga = ({ fichaEscaneada, onRecargaSuccess, onVoltar }) => {
       const { data: recargaData, error: recargaError } = await supabase
         .from('Recarga')
         .insert({
-          id_ficha: fichaEscaneada.id,
+          id_ficha: fichaEscaneada.id_ficha,
           id_evento: fichaEscaneada.id_evento,
           valor: valorRecarga
         })
