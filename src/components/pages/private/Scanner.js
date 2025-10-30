@@ -5,7 +5,7 @@ import style from './Scanner.module.css';
 const Scanner = ({ onQRCodeRead, onClose }) => {
     const [scanResult, setScanResult] = useState(null);
     const [error, setError] = useState(null);
-    
+
     const scannerInstanceRef = useRef(null);
     const isComponentMounted = useRef(true);
 
@@ -13,15 +13,13 @@ const Scanner = ({ onQRCodeRead, onClose }) => {
 
     const success = (result) => {
         if (isComponentMounted.current) {
-            // Parar e limpar scanner
             const localScanner = scannerInstanceRef.current;
             if (localScanner) {
                 localScanner.clear()
                     .then(() => {
                         scannerInstanceRef.current = null;
                         setScanResult(result);
-                        
-                        // Chamar callback se existir
+
                         if (onQRCodeRead) {
                             onQRCodeRead(result);
                         }
@@ -29,21 +27,21 @@ const Scanner = ({ onQRCodeRead, onClose }) => {
                     .catch(err => {
                         console.error("Erro ao limpar scanner:", err);
                         setScanResult(result);
-                        
+
                         if (onQRCodeRead) {
                             onQRCodeRead(result);
                         }
                     });
             } else {
                 setScanResult(result);
-                
+
                 if (onQRCodeRead) {
                     onQRCodeRead(result);
                 }
             }
         }
     };
-    
+
     const handleScanAgain = () => {
         setScanResult(null);
         setError(null);
@@ -51,9 +49,9 @@ const Scanner = ({ onQRCodeRead, onClose }) => {
 
     useEffect(() => {
         isComponentMounted.current = true;
-        
+
         if (scanResult === null && !scannerInstanceRef.current) {
-            
+
             if (!Html5QrcodeScanner) {
                 setError("Biblioteca de scanner não foi carregada.");
                 return;
@@ -61,7 +59,7 @@ const Scanner = ({ onQRCodeRead, onClose }) => {
 
             const timer = setTimeout(() => {
                 const element = document.getElementById(qrcodeRegionId);
-                
+
                 if (!element) {
                     console.error(`Elemento com id="${qrcodeRegionId}" não encontrado no DOM`);
                     return;
@@ -74,7 +72,7 @@ const Scanner = ({ onQRCodeRead, onClose }) => {
                         rememberLastUsedCamera: true,
                         aspectRatio: 1.0
                     });
-                    
+
                     scannerInstanceRef.current = scanner;
                     scanner.render(success);
                 }
@@ -87,7 +85,7 @@ const Scanner = ({ onQRCodeRead, onClose }) => {
 
         return () => {
             isComponentMounted.current = false;
-            
+
             const localScanner = scannerInstanceRef.current;
             if (localScanner) {
                 localScanner.clear()
@@ -107,7 +105,7 @@ const Scanner = ({ onQRCodeRead, onClose }) => {
                 <h1 className={style.title}>
                     Scanner QR Code
                 </h1>
-                
+
                 {scanResult ? (
                     <div className={style.resultContainer}>
                         <h2 className={style.resultTitle}>
@@ -116,14 +114,14 @@ const Scanner = ({ onQRCodeRead, onClose }) => {
                         <p className={style.resultText}>
                             {scanResult}
                         </p>
-                        
+
                         <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
                             <button
                                 onClick={handleScanAgain}
                                 className={style.scanAgainButton}>
                                 Escanear Novamente
                             </button>
-                            
+
                             {onClose && (
                                 <button
                                     onClick={onClose}
@@ -139,13 +137,13 @@ const Scanner = ({ onQRCodeRead, onClose }) => {
                             Aponte a câmera para o código QR
                         </p>
                         <div id={qrcodeRegionId}></div>
-                        
+
                         {error && (
                             <div className={style.errorBox}>
                                 ❌ {error}
                             </div>
                         )}
-                        
+
                         {onClose && (
                             <button
                                 onClick={onClose}

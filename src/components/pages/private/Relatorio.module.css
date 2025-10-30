@@ -1,0 +1,177 @@
+.relatorioContainer {
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: var(--bg-cor);
+  border-radius: 12px;
+  box-shadow: 0 4px 25px rgba(0, 0, 0, 0.05);
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.loading,
+.error {
+  text-align: center;
+  font-size: 1.2rem;
+  color: #666;
+  padding: 3rem;
+}
+.error {
+  color: #dc3545;
+}
+
+.backButton {
+  display: inline-block;
+  margin-bottom: 1.5rem;
+  padding: 5px;
+  text-decoration: none;
+  color: var(--primary-color);
+  border: 1px solid var(--primary-color);
+  border-radius: 10px;
+  font-weight: 500;
+  transition: transform 0.2s ease;
+}
+.backButton:hover {
+  text-decoration: underline;
+  transform: translateX(-2px);
+}
+
+.relatorioContainer h2 {
+  text-align: center;
+  text-transform: uppercase;
+  color: var(--secondary-color);
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+.relatorioContainer h3 {
+  text-align: center;
+  color: var(--primary-color);
+  text-transform: uppercase;
+  font-weight: 600;
+  font-size: 1.3rem;
+  margin-bottom: 2.5rem;
+}
+
+.totalCard {
+  background: var(--off-white);
+  border-radius: 10px;
+  padding: 1.5rem;
+  text-align: center;
+  border: 1px solid #eee;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.totalCard h4 {
+  margin: 0 0 0.5rem 0;
+  color: var(--text-color);
+  font-size: 1rem;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.totalCard span {
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.valorPositivo {
+  color: #28a745;
+}
+.valorNegativo {
+  color: #dc3545;
+}
+.valorTotal {
+  color: #333;
+}
+
+.divider {
+  border: 0;
+  height: 1px;
+  background: #e0e0e0;
+  margin: 2.5rem 0;
+}
+
+.reportTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1.5rem;
+  font-size: 0.95rem;
+}
+
+.reportTable th,
+.reportTable td {
+  padding: 0.9rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.reportTable th:not(:first-child),
+.reportTable td:not(:first-child) {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.reportTable thead th {
+  background-color: #f7f7f7;
+  color: #444;
+  font-weight: 600;
+  border-bottom-width: 2px;
+}
+
+.reportTable tbody tr:nth-child(even) {
+  background-color: #fdfdfd;
+}
+.reportTable tbody tr:hover {
+  background-color: #f1f1f1;
+}
+
+/* Célula de "Nenhum item" */
+.reportTable td[colSpan="4"] {
+  text-align: center;
+  color: #888;
+  padding: 2rem;
+  font-style: italic;
+}
+
+/* Rodapé da Tabela */
+.reportTable tfoot {
+  border-top: 2px solid #333;
+  font-weight: 700;
+}
+.reportTable tfoot td {
+  font-size: 1.1rem;
+  color: #333;
+}
+.reportTable tfoot td:first-child {
+  text-align: right;
+}
+
+@media (max-width: 768px) {
+  .relatorioContainer {
+    margin: 1rem;
+    padding: 1rem;
+  }
+  
+  .totaisGrid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .relatorioContainer h2 {
+    font-size: 1.8rem;
+  }
+  .relatorioContainer h3 {
+    font-size: 1.1rem;
+  }
+}

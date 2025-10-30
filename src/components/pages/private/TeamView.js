@@ -25,7 +25,7 @@ const TeamView = () => {
           .from('Evento')
           .select('*')
           .eq('team_token', teamToken)
-          .eq('status', true)
+          .eq('status', 'INICIADO')
           .single();
 
         if (error || !evento) {

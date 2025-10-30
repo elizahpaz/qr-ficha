@@ -32,7 +32,7 @@ function CadastroEvento() {
         .insert({
           id_org: idOrg,
           nome: nomeEvento,
-          status: false,
+          status: 'CRIADO',
         })
         .select('id');
 

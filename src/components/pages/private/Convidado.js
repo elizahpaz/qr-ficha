@@ -23,7 +23,7 @@ const Convidado = () => {
           .from('Evento')
           .select('*')
           .eq('id_org', idOrg)
-          .eq('status', true)
+          .eq('status', 'INICIADO')
           .single();
 
         if (eventoError && eventoError.code !== 'PGRST116') {

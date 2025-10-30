@@ -1,91 +1,114 @@
 .container {
+  background: var(--bg-cor);
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   justify-content: space-between;
   align-items: center;
   gap: 1rem;
-  padding: 1.5rem;
-  margin-bottom: 1rem;
-  background-color: #ffffff;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  border: 1px solid #e0e0e0;
+  overflow: hidden; 
 }
 
 .container h3 {
+  margin: 0;
   font-size: 1.25rem;
   color: var(--secondary-color);
-  margin: 0;
-  text-align: center;
-  font-weight: 600;
   text-transform: uppercase;
+  font-weight: 600;
+  flex-grow: 1;
+  flex-shrink: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.container button {
-  width: 90%;
-  padding: 0.75rem 1.5rem;
+.actionsContainer {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  
+  flex-shrink: 0; 
+  min-width: 0;
+  max-width: 50%;
+}
+
+.shareSection {
+  display: inline-block;
+}
+
+.actionButton,
+.button {
+  display: inline-block;
+  padding: 0.7rem 1.2rem;
+  border-radius: 6px;
   font-size: 1rem;
-  font-weight: bold;
-  color: #fff;
-  background-color: var(--primary-color);
-  border: none;
-  border-radius: 8px;
+  font-weight: 600;
+  text-decoration: none;
+  text-align: center;
   cursor: pointer;
+  border: 1px solid transparent;
+  white-space: nowrap;
 }
 
-.container button:disabled {
-  background-color: #cccccc;
-  cursor: not-allowed;
+.actionButton {
+  background-color: var(--primary-color);
+  color: white;
 }
 
 .button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 90%;
-  padding: 0.5rem;
+  background-color: transparent;
   color: var(--text-color);
-  text-decoration: none;
-  font-size: 1rem;
-  border: 2px solid #555;
-  border-radius: 8px;
+  border: 1px solid var(--secondary-color);
 }
 
-.urlText {
-  font-size: 0.9rem;
-  color: #555;
-  text-align: center;
-  word-break: break-all;
+.deleteButton {
+  background-color: #dc3545;
+  color: white;
+  border-color: #dc3545;
 }
 
-.urlText a {
-  color: #007bff;
-  text-decoration: underline;
+.copySuccess {
+  background-color: #28a745;
+  border-color: #28a745;
+  color: white;
 }
 
-
-@media (min-width: 768px) {
+@media (max-width: 768px) {
+  
   .container {
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-    gap: 2rem;
-    padding: 1rem 2rem;
+    flex-direction: column;
+    align-items: stretch;
   }
 
   .container h3 {
-    text-align: left;
-    flex-grow: 1; 
-    min-width: 200px;
+    text-align: center;
+    margin-bottom: 1rem;
+    white-space: normal;
   }
   
-  .container button,
-  .button {
-    width: auto;
-    flex-shrink: 0; 
+  .actionsContainer {
+    flex-direction: column;
+    width: 100%;
+    max-width: 100%;
+    gap: 0.5rem;
+    align-items: stretch;
   }
 
-  .button {
-    min-width: 80px;
+  .actionsContainer > *,
+  .shareSection {
+    width: 100%;
+    box-sizing: border-box; 
+  }
+
+  /* No mobile, o botão "Copiar" já está alinhado 100% */
+  .shareSection {
+    margin-top: 0; /* Remove a margem extra no mobile */
   }
 }
