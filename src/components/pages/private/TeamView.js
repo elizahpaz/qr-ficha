@@ -48,58 +48,105 @@ const TeamView = () => {
     }
   }, [teamToken]);
 
-  const handleQRCodeRead = async (qrData) => {
-    try {
-      setLoading(true);
-      
-      const dadosQR = JSON.parse(qrData);
-      
-      if (dadosQR.type !== 'ficha_digital') {
-        alert('QR Code inválido para este sistema');
-        setTelaAtual('menu_inicial');
-        return;
-      }
+  /**
+ * Processa o texto lido do QR Code.
+ * Esta função foi refatorada para adicionar validação e depuração.
+ */
+const handleQRCodeRead = async (qrData) => {
+  try {
+    setLoading(true);
 
-      await buscarFichaPorId(dadosQR.fichaId);
+    // --- DEBUG 1: O que o scanner está lendo? ---
+    // Verifique seu console (F12) para ver o texto puro que o scanner leu.
+    console.log("QR Code lido (texto puro):", qrData);
 
-    } catch (error) {
-      console.error('Erro ao processar QR Code:', error);
-      alert('QR Code inválido ou erro ao processar');
+    if (!qrData || typeof qrData !== 'string') {
+      alert('Erro de leitura: O scanner não retornou um texto válido.');
       setTelaAtual('menu_inicial');
-    } finally {
-      setLoading(false);
+      return; // O 'finally' será chamado
     }
-  };
+    // --- Fim Debug 1 ---
 
-  const buscarFichaPorId = async (fichaId) => {
+    let dadosQR;
     try {
-      const { data: fichaEventoData, error } = await supabase
-        .from('fichaEvento')
-        .select('*')
-        .eq('id_ficha', fichaId)
-        .eq('id_evento', eventoValido.id)
-        .single();
+      // Tenta converter o texto em um objeto JSON
+      dadosQR = JSON.parse(qrData);
+    } catch (parseError) {
+      // Se falhar, o QR Code NÃO é JSON.
+      console.error("Erro de JSON.parse:", parseError);
+      alert(`QR Code não é um JSON válido. Conteúdo lido: ${qrData}`);
+      setTelaAtual('menu_inicial');
+      return; // O 'finally' será chamado
+    }
 
-      if (error) {
-        console.error('Erro ao buscar ficha:', error);
-        throw error;
-      }
+    // --- DEBUG 2: O que o JSON contém? ---
+    console.log("Objeto JSON parseado:", dadosQR);
 
-      if (!fichaEventoData) {
-        alert('Ficha não encontrada neste evento');
-        setTelaAtual('menu_inicial');
-        return;
-      }
+    // Validação 1: O JSON tem o tipo correto?
+    if (!dadosQR || dadosQR.type !== 'ficha_digital') {
+      alert('QR Code inválido para este sistema (type não é "ficha_digital").');
+      setTelaAtual('menu_inicial');
+      return; // O 'finally' será chamado
+    }
 
-      setFichaEscaneada(fichaEventoData);
-      setTelaAtual('ficha_escaneada');
+    // Validação 2: O JSON tem um fichaId válido?
+    const fichaIdRecebida = dadosQR.fichaId;
+    console.log("fichaId extraída do JSON:", fichaIdRecebida);
 
-    } catch (error) {
+    if (!fichaIdRecebida) {
+      // Este é o seu erro! O JSON foi lido, mas a chave "fichaId" é null, 0, ou undefined.
+      alert(`QR Code lido com sucesso, mas o ID da ficha está NULO ou ausente no JSON.`);
+      setTelaAtual('menu_inicial');
+      return; // O 'finally' será chamado
+    }
+
+    // Se passou em todas as validações, busca a ficha
+    await buscarFichaPorId(fichaIdRecebida);
+
+  } catch (error) {
+    // Este 'catch' agora só pega erros do 'buscarFichaPorId'
+    console.error('Erro ao processar QR Code (na etapa buscarFichaPorId):', error);
+    alert('Erro interno ao buscar dados da ficha.');
+    setTelaAtual('menu_inicial');
+  } finally {
+    // Isso garante que o loading sempre pare, não importa o que aconteça
+    setLoading(false);
+  }
+};
+
+/**
+ * Busca a ficha. Esta função está correta, pois funciona na busca manual.
+ * Nenhuma refatoração necessária aqui.
+ */
+const buscarFichaPorId = async (fichaId) => {
+  try {
+    const { data: fichaEventoData, error } = await supabase
+      .from('fichaEvento')
+      .select('*')
+      .eq('id_ficha', fichaId)
+      .eq('id_evento', eventoValido.id)
+      .single();
+
+    if (error) {
       console.error('Erro ao buscar ficha:', error);
-      alert('Erro ao buscar ficha. Verifique o ID e tente novamente.');
-      setTelaAtual('menu_inicial');
+      throw error;
     }
-  };
+
+    if (!fichaEventoData) {
+      alert('Ficha não encontrada neste evento');
+      setTelaAtual('menu_inicial');
+      return;
+    }
+
+    setFichaEscaneada(fichaEventoData);
+    setTelaAtual('ficha_escaneada');
+
+  } catch (error) {
+    console.error('Erro ao buscar ficha:', error);
+    alert('Erro ao buscar ficha. Verifique o ID e tente novamente.');
+    setTelaAtual('menu_inicial');
+  }
+};
 
   const handleBuscarManual = async (e) => {
     e.preventDefault();

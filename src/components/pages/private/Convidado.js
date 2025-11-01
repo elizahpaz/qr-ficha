@@ -84,17 +84,20 @@ const Convidado = () => {
     }
   }, [idOrg, localStorageKey]);
 
-  const handleCadastro = async (nome, contato) => {
+const handleCadastro = async (nome, contato) => {
   try {
     setLoading(true);
+    setError(null); 
 
+    //Busca todas as fichas da Organização
     const { data: todasFichas, error: fichasError } = await supabase
       .from('Ficha')
-      .select('*')
+      .select('id, qr_code')
       .eq('id_org', idOrg);
 
     if (fichasError) throw fichasError;
 
+    //Busca fichas já usadas neste evento
     const { data: fichasUsadas, error: usadasError } = await supabase
       .from('fichaEvento')
       .select('id_ficha')
@@ -102,38 +105,41 @@ const Convidado = () => {
 
     if (usadasError) throw usadasError;
 
+    //Encontra uma ficha existente livre
     const idsUsadas = fichasUsadas.map(f => f.id_ficha);
     let fichaLivre = todasFichas.find(f => !idsUsadas.includes(f.id));
 
+    //Se não houver ficha livre, cria uma nova
     if (!fichaLivre) {
       const { data: novaFicha, error: criarFichaError } = await supabase
         .from('Ficha')
         .insert({
-          qr_code: '', 
+          qr_code: '',
           id_org: idOrg
         })
-        .select()
+        .select('id, qr_code')
         .single();
 
       if (criarFichaError) throw criarFichaError;
+      
+      fichaLivre = novaFicha;
+    }
 
-      const qrCodeData = JSON.stringify({
-        fichaId: novaFicha.id, 
-        orgId: idOrg,
-        type: 'ficha_digital'
-      });
+    const qrCodeData = JSON.stringify({
+      fichaId: fichaLivre.id,
+      orgId: idOrg,
+      type: 'ficha_digital'
+    });
 
+    if (fichaLivre.qr_code !== qrCodeData) {
       const { error: updateError } = await supabase
         .from('Ficha')
         .update({ qr_code: qrCodeData })
-        .eq('id', novaFicha.id);
+        .eq('id', fichaLivre.id);
 
-      if (updateError) throw updateError;
-
-      fichaLivre = {
-        ...novaFicha,
-        qr_code: qrCodeData
-      };
+      if (updateError) {
+        console.warn("Corrigindo QR Code obsoleto no banco...", updateError);
+      }
     }
 
     const { error: eventoError } = await supabase
@@ -148,17 +154,18 @@ const Convidado = () => {
 
     if (eventoError) throw eventoError;
 
-    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(fichaLivre.qr_code)}`;
+    //Gera a URL da imagem do QR Code usando o JSON
+    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(qrCodeData)}`;
 
-    const novaFicha = {
+    const novaFichaAtribuida = {
       id: fichaLivre.id,
       nome_titular: nome,
       contato: contato,
       saldo: 0,
-      qrCode: fichaLivre.qr_code
+      qrCode: qrCodeData
     };
 
-    setFichaAtribuida(novaFicha);
+    setFichaAtribuida(novaFichaAtribuida);
     setQrCodeUrl(qrUrl);
 
     const dadosParaSalvar = {
@@ -166,14 +173,14 @@ const Convidado = () => {
       eventoId: eventoAtivo.id,
       nome_titular: nome,
       contato: contato,
-      qrCode: fichaLivre.qr_code,
+      qrCode: qrCodeData,
       qrCodeUrl: qrUrl
     };
     localStorage.setItem(localStorageKey, JSON.stringify(dadosParaSalvar));
 
   } catch (error) {
     console.error('Erro ao processar cadastro:', error);
-    setError('Erro ao processar cadastro');
+    setError('Erro ao processar cadastro: ' + error.message);
   } finally {
     setLoading(false);
   }
