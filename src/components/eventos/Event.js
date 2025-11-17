@@ -85,7 +85,7 @@ const handleDelete = async (eventId) => {
                 onClick={handleCopyLink}
                 className={`${styles.button} ${isCopied ? styles.copySuccess : ''}`}
               >
-                {isCopied ? 'Link Copiado!' : 'Copiar Link'}
+                {isCopied ? 'Link Copiado!' : 'Copiar link para Equipe'}
               </button>
           </>
         );
