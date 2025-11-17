@@ -144,7 +144,7 @@ function AddItem() {
   return (
     <div className={styles.container}>
       <h2 className={styles.title}>ITENS DO EVENTO:</h2>
-      <h2 className={styles.title}>{eventName}</h2>
+      <h2 className={styles.titleEvent}>{eventName}</h2>
       
       {error && <div className={styles.error}>{error}</div>}
       

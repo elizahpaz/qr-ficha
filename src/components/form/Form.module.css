@@ -9,7 +9,6 @@
   max-width: 150px;
   max-height: 100px;
   margin: auto;
-
 }
 
 .formSection {
@@ -20,7 +19,6 @@
   background-color: white;
   border-radius: 12px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08); 
-
 }
 
 .title {
@@ -74,5 +72,5 @@ input:focus {
 }
 
 .disabled {
-  background-color: #8a8a8a;
+  background-color: #dbdbdb;
 }

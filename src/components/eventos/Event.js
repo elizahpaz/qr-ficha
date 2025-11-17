@@ -1,18 +1,44 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import styles from './Event.module.css';
+import { supabase } from './../../database/supabaseClient';
 
-const Event = ({ evento, onUpdateStatus, onDeleteEvent }) => {
+const Event = ({ evento, onUpdateStatus, onEventDeleted }) => {
 
   const eventUrl = `${window.location.origin}/team-view/${evento.team_token}`;
-  
   const [isCopied, setIsCopied] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
-  const handleDelete = () => {
-    if (window.confirm('Tem certeza que deseja exluir o evento? O relatório também será excluído.')) {
-      alert(`Função de deletar (ID: ${evento.id}) ainda não implementada.`);
+
+const handleDelete = async (eventId) => {
+  if (!window.confirm("ATENÇÃO: Você tem certeza que deseja deletar este evento? Esta ação é irreversível e excluirá todos os dados relacionados (fichas, transações, etc.)")) {
+    return;
+  }
+
+  try {
+    const { error: eventError } = await supabase
+      .from('Evento')
+      .delete()
+      .eq('id', eventId)
+      .single();
+
+    if (eventError) {
+      console.error('Erro ao deletar o Evento:', eventError);
+      throw eventError;
     }
-  };
+
+    onEventDeleted(eventId);
+    
+    alert(`Evento ${eventId} deletado com sucesso. Todos os dados relacionados foram limpos.`);
+
+  } catch (error) {
+    console.error('Falha na deleção do evento:', error);
+    setError(`Erro ao deletar o evento: ${error.message}`);
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(eventUrl).then(() => {
@@ -69,7 +95,7 @@ const Event = ({ evento, onUpdateStatus, onDeleteEvent }) => {
         return (
           <>
             <button 
-              onClick={handleDelete} 
+              onClick={() => handleDelete(evento.id)}
               className={`${styles.actionButton} ${styles.deleteButton}`}
             >
               Excluir

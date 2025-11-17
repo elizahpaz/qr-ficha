@@ -41,12 +41,13 @@
 
 .button {
   background-color: var(--primary-color);
+  text-decoration: none;
   color: var(--bg-cor);
   font-size: 1.4rem;
   font-weight: 700;
   padding: 1.2rem 3rem;
   border: none;
-  border-radius: 50px; 
+  border-radius: 10px; 
   cursor: pointer;
   transition: all 0.3s ease; 
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);

@@ -1,63 +1,83 @@
 .container {
-  background-color: var(--bg-cor);
-  padding: 15px;
-  text-align: center;
+  max-width: 600px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
 }
 
 .title {
-  color: var(--primary-color);
-  text-align: center;
-  font-weight: 600;
+  color: var(--secondary-color);
   text-transform: uppercase;
+  font-size: 1.5rem;
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+.titleEvent {
+  color: var(--primary-color);
+  text-transform: uppercase;
+  font-size: 1.2rem;
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+.error {
+  background-color: #fee2e2;
+  color: #ef4444;
+  padding: 10px;
+  border-radius: 6px;
+  margin-bottom: 15px;
+  text-align: center;
 }
 
 .addItem {
-  width: 120px;
-  height: 60px;
-  border-radius: 20px; 
-  margin-bottom: 10px;
-  background-color: var(--secondary-color); 
-  border: none;
+  display: block;
+  width: 100%;
+  padding: 15px;
+  margin: 20px 0;
+  background-color: #dbeafe;
+  color: #1e40af;
+  border: 1px dashed #93c5fd;
+  border-radius: 8px;
   cursor: pointer;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.2s;
+  font-weight: bold;
 }
 
 .icon {
-  color: white; 
-  font-size: 1.5rem;
-}
-
-.card{
-  background-color: var(--off-white);
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  padding: 1.5rem;
-  max-width: 600px; 
-  margin: 1.5rem auto;
+  margin-right: 8px;
+  vertical-align: middle;
 }
 
 .actionButtons {
-  display: flex;
-  gap: 15px; 
-  margin: auto;
-  margin-top: 20px;
-  padding: 10px;
-  width: 600px;
-  box-sizing: border-box;
+  display: flex; 
+  gap: 15px;
+  margin-top: 30px;
+  padding-top: 15px;
+  border-top: 1px solid #e5e7eb;
 }
 
 .deleteEventButton {
   flex-grow: 1; 
-  flex-shrink: 0;
   flex-basis: 0;
+  
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 12px 15px;
+  border-radius: 10px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s;
 }
 
-
-.actionButtons :global(.SubmitButton) {
+.actionButtons > *:last-child {
   flex-grow: 2; 
-  flex-shrink: 0;
   flex-basis: 0;
 }
+
 
 /*Estilo específico de Convidado.js*/
 .fichaContainer {

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../../database/supabaseClient';
 import styles from './Perfil.module.css';
 import Input from '../../form/Input';
@@ -11,6 +12,9 @@ const Perfil = () => {
   const [loading, setLoading] = useState(true);
   const [loadingCnpj, setLoadingCnpj] = useState(false);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
+  const [confirmacao, setConfirmacao] = useState('');
+  const [mostrarModal, setMostrarModal] = useState(false);
 
   useEffect(() => {
     async function fetchOrgData() {
@@ -120,7 +124,46 @@ const Perfil = () => {
   if (loading) {
     return <div>Carregando dados...</div>;
   }
-  
+  const handleDeletarConta = async () => {
+    try {
+      setLoading(true);
+
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError || !session) {
+        throw new Error('Sessão não encontrada. Faça login novamente.');
+      }
+
+      const userId = session.user.id;
+      const { error: orgError } = await supabase
+        .from('Organização')
+        .delete()
+        .eq('id', userId);
+      
+      if (orgError) throw orgError;
+
+      console.log('Organização deletada (cascata ativada)');
+      console.log('Deletando usuário da autenticação...');
+      
+      const { error: deleteUserError } = await supabase.rpc('delete_user');
+      
+      if (deleteUserError) {
+        console.error('Erro ao deletar usuário:', deleteUserError);
+        // Mesmo com erro, fazer logout
+        await supabase.auth.signOut();
+      }
+      console.log('Conta deletada com sucesso!');
+      alert('Conta deletada com sucesso! Todos os seus dados foram removidos.');
+      navigate('/login');
+
+    } catch (error) {
+      console.error('Erro ao deletar conta:', error);
+      alert('Erro ao deletar conta: ' + error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className={styles.container}>
       <h2 className={styles.title}>Dados da conta</h2>
@@ -144,11 +187,18 @@ const Perfil = () => {
 
         <div className={styles.btnSection}>
           <SubmitButton text={"Salvar"} type submit/>
-          <button className={styles.button}>Deletar conta</button>
+          <button 
+            onClick={handleDeletarConta}
+            className={styles.button}
+            disabled={loading}
+          >
+            Deletar Conta
+          </button>
         </div>
-
       </form>
+
       {error && <div className={styles.errorMessage}>{`Erro: ${error}`}</div>}
+
     </div>
   );
 };
